@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高速公路征地拆迁管理系统 - 区域补偿标准库</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 区域补偿标准库特定样式 */
+        .compensation-standard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 搜索和筛选区域 */
+        .search-filter-container {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .search-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .search-group {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .search-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+            min-width: 100px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .search-select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+        
+        .search-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .btn-filter {
+            padding: 8px 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-filter:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-reset {
+            padding: 8px 16px;
+            background-color: white;
+            color: var(--info);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-reset:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* 数据卡片区域 */
+        .data-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .data-card {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .data-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+        
+        .card-icon-primary {
+            background-color: var(--primary);
+        }
+        
+        .card-icon-info {
+            background-color: var(--info);
+        }
+        
+        .card-icon-success {
+            background-color: var(--success);
+        }
+        
+        .card-icon-warning {
+            background-color: var(--warning);
+        }
+        
+        .card-title {
+            font-size: 14px;
+            color: var(--info);
+            font-weight: 500;
+        }
+        
+        .card-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .card-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .card-change.positive {
+            color: var(--success);
+        }
+        
+        .card-change.negative {
+            color: var(--danger);
+        }
+        
+        /* 表格区域 */
+        .table-container {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background-color: var(--bg-light);
+        }
+        
+        .table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-action-button {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .table-action-button:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background-color: var(--bg-light);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        
+        .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--dark);
+        }
+        
+        .data-table tr:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        .table-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-primary {
+            background-color: rgba(22, 93, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        .badge-success {
+            background-color: rgba(0, 180, 42, 0.1);
+            color: var(--success);
+        }
+        
+        .badge-warning {
+            background-color: rgba(255, 125, 0, 0.1);
+            color: var(--warning);
+        }
+        
+        .badge-danger {
+            background-color: rgba(245, 63, 63, 0.1);
+            color: var(--danger);
+        }
+        
+        .table-actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-action {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .table-action:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .table-action.view {
+            color: var(--primary);
+        }
+        
+        .table-action.edit {
+            color: var(--warning);
+        }
+        
+        .table-action.delete {
+            color: var(--danger);
+        }
+        
+        .table-action.copy {
+            color: var(--info);
+        }
+        
+        /* 金额显示样式 */
+        .amount {
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        /* 版本信息 */
+        .version-info {
+            font-size: 12px;
+            color: var(--info);
+        }
+        
+        /* 分页区域 */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            background-color: var(--bg-light);
+        }
+        
+        .pagination-info {
+            font-size: 14px;
+            color: var(--info);
+        }
+        
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .pagination-button {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .pagination-button:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .pagination-button.active {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-select {
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        /* 响应式样式 */
+        @media (max-width: 768px) {
+            .search-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .search-group {
+                width: 100%;
+            }
+            
+            .data-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .table-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .pagination-container {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .pagination-controls {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* 补偿类型标签 */
+        .compensation-type-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .compensation-type-land {
+            background-color: rgba(22, 93, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        .compensation-type-house {
+            background-color: rgba(0, 180, 42, 0.1);
+            color: var(--success);
+        }
+        
+        .compensation-type-attachment {
+            background-color: rgba(255, 125, 0, 0.1);
+            color: var(--warning);
+        }
+        
+        .compensation-type-other {
+            background-color: rgba(142, 142, 147, 0.1);
+            color: var(--info);
+        }
+        
+        /* 生效状态指示器 */
+        .effective-status {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .status-dot.active {
+            background-color: var(--success);
+        }
+        
+        .status-dot.inactive {
+            background-color: var(--danger);
+        }
+        
+        /* 地区层级显示 */
+        .region-hierarchy {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+        }
+        
+        .region-level {
+            padding: 2px 6px;
+            background-color: var(--bg-light);
+            border-radius: 3px;
+            font-size: 11px;
+        }
+        
+        /* 补偿标准比较 */
+        .compensation-comparison {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+        }
+        
+        .comparison-icon {
+            color: var(--info);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="compensation-standard-container">
+        <!-- 侧边栏导航 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-road logo-icon"></i>
+                    <span class="logo-text">征拆管理系统</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <div class="menu-section-title">主导航</div>
+                
+                <a href="dashboard.html" class="menu-item">
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">仪表盘</span>
+                </a>
+                
+                <div class="menu-section-title">GIS数据管理</div>
+                
+                <a href="gis-data-upload.html" class="menu-item">
+                    <i class="fas fa-upload menu-icon"></i>
+                    <span class="menu-text">测绘数据上传</span>
+                </a>
+                
+                <a href="gis-publish.html" class="menu-item">
+                    <i class="fas fa-map-marked-alt menu-icon"></i>
+                    <span class="menu-text">GIS发布</span>
+                </a>
+                
+                <div class="menu-section-title">台账管理</div>
+                
+                <a href="gis-ledger.html" class="menu-item">
+                    <i class="fas fa-database menu-icon"></i>
+                    <span class="menu-text">GIS台账</span>
+                </a>
+                
+                <a href="land-ledger.html" class="menu-item">
+                    <i class="fas fa-paragraph menu-icon"></i>
+                    <span class="menu-text">征地台账</span>
+                </a>
+                
+                <a href="house-ledger.html" class="menu-item">
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">房屋台账</span>
+                </a>
+                
+                <a href="attachment-ledger.html" class="menu-item">
+                    <i class="fas fa-paperclip menu-icon"></i>
+                    <span class="menu-text">附着物台账</span>
+                </a>
+                
+                <a href="audit-ledger.html" class="menu-item">
+                    <i class="fas fa-search menu-icon"></i>
+                    <span class="menu-text">审核台账</span>
+                </a>
+                
+                <a href="agreement-ledger.html" class="menu-item">
+                    <i class="fas fa-file-contract menu-icon"></i>
+                    <span class="menu-text">协议台账</span>
+                </a>
+                
+                <a href="settlement-ledger.html" class="menu-item">
+                    <i class="fas fa-money-bill-wave menu-icon"></i>
+                    <span class="menu-text">结算台账</span>
+                </a>
+                
+                <div class="menu-section-title">基础配置管理</div>
+                
+                <a href="form-template.html" class="menu-item">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">表单协议模板管理</span>
+                </a>
+                
+                <a href="process-config.html" class="menu-item">
+                    <i class="fas fa-sitemap menu-icon"></i>
+                    <span class="menu-text">流程配置</span>
+                </a>
+                
+                <a href="compensation-standard.html" class="menu-item active">
+                    <i class="fas fa-list-ol menu-icon"></i>
+                    <span class="menu-text">区域补偿标准库</span>
+                </a>
+                
+                <div class="menu-section-title">统计分析</div>
+                
+                <a href="demolition-stats.html" class="menu-item">
+                    <i class="fas fa-chart-bar menu-icon"></i>
+                    <span class="menu-text">征拆区域统计</span>
+                </a>
+                
+                <a href="project-stats.html" class="menu-item">
+                    <i class="fas fa-chart-line menu-icon"></i>
+                    <span class="menu-text">项目统计</span>
+                </a>
+                
+                <a href="group-stats.html" class="menu-item">
+                    <i class="fas fa-chart-pie menu-icon"></i>
+                    <span class="menu-text">集团统计</span>
+                </a>
+                
+                <div class="menu-section-title">系统管理</div>
+                
+                <a href="user-role.html" class="menu-item">
+                    <i class="fas fa-users-cog menu-icon"></i>
+                    <span class="menu-text">用户角色管理</span>
+                </a>
+                
+                <a href="project-auth.html" class="menu-item">
+                    <i class="fas fa-key menu-icon"></i>
+                    <span class="menu-text">项目授权管理</span>
+                </a>
+                
+                <div class="menu-section-title">辅助支持</div>
+                
+                <a href="function-demo.html" class="menu-item">
+                    <i class="fas fa-play-circle menu-icon"></i>
+                    <span class="menu-text">功能演示入口</span>
+                </a>
+                
+                <a href="training-materials.html" class="menu-item">
+                    <i class="fas fa-book menu-icon"></i>
+                    <span class="menu-text">培训资料</span>
+                </a>
+                
+                <a href="operation-manual.html" class="menu-item">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">操作手册</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="main-content" id="mainContent">
+            <!-- 顶部导航栏 -->
+            <header class="top-nav" id="topNav">
+                <div class="nav-left">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="nav-title">区域补偿标准库</h1>
+                </div>
+                
+                <div class="nav-right">
+                    <div class="nav-item">
+                        <i class="fas fa-bell nav-icon"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-envelope nav-icon"></i>
+                        <span class="notification-badge">2</span>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-cog nav-icon"></i>
+                    </div>
+                    
+                    <div class="user-profile">
+                        <div class="avatar">张</div>
+                        <div class="user-info">
+                            <div class="user-name">张三</div>
+                            <div class="user-role">系统管理员</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- 页面内容 -->
+            <div class="page-content">
+                <div class="page-header">
+                    <h2 class="page-title">区域补偿标准库</h2>
+                    <div class="flex gap-3">
+                        <button class="btn btn-primary" id="addStandardBtn">
+                            <i class="fas fa-plus"></i> 新增标准
+                        </button>
+                        <button class="btn btn-secondary" id="importStandardBtn">
+                            <i class="fas fa-file-import"></i> 导入标准
+                        </button>
+                        <button class="btn btn-secondary" id="exportBtn">
+                            <i class="fas fa-file-export"></i> 导出
+                        </button>
+                        <button class="btn btn-secondary" id="compareBtn">
+                            <i class="fas fa-exchange-alt"></i> 标准比较
+                        </button>
+                        <button class="btn btn-secondary" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i> 刷新
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 搜索和筛选区域 -->
+                <div class="search-filter-container">
+                    <div class="search-row">
+                        <div class="search-group">
+                            <label for="province">省份</label>
+                            <select id="province" class="search-select">
+                                <option value="">全部省份</option>
+                                <option value="anhui">安徽省</option>
+                                <option value="beijing">北京市</option>
+                                <option value="chongqing">重庆市</option>
+                                <option value="fujian">福建省</option>
+                                <option value="gansu">甘肃省</option>
+                                <option value="guangdong">广东省</option>
+                                <option value="guangxi">广西壮族自治区</option>
+                                <option value="guizhou">贵州省</option>
+                                <option value="hainan">海南省</option>
+                                <option value="hebei">河北省</option>
+                                <option value="heilongjiang">黑龙江省</option>
+                                <option value="henan">河南省</option>
+                                <option value="hubei">湖北省</option>
+                                <option value="hunan">湖南省</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="city">城市</label>
+                            <select id="city" class="search-select">
+                                <option value="">全部城市</option>
+                                <option value="wuhan">武汉市</option>
+                                <option value="xianning">咸宁市</option>
+                                <option value="huangshi">黄石市</option>
+                                <option value="jingzhou">荆州市</option>
+                                <option value="yichang">宜昌市</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="district">区县</label>
+                            <select id="district" class="search-select">
+                                <option value="">全部区县</option>
+                                <option value="jiangxia">江夏区</option>
+                                <option value="hongshan">洪山区</option>
+                                <option value="wuchang">武昌区</option>
+                                <option value="qiaokou">硚口区</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="search-row">
+                        <div class="search-group">
+                            <label for="standardType">标准类型</label>
+                            <select id="standardType" class="search-select">
+                                <option value="">全部类型</option>
+                                <option value="land">征地补偿</option>
+                                <option value="house">房屋补偿</option>
+                                <option value="attachment">附着物补偿</option>
+                                <option value="other">其他补偿</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="effectiveStatus">生效状态</label>
+                            <select id="effectiveStatus" class="search-select">
+                                <option value="">全部状态</option>
+                                <option value="active">已生效</option>
+                                <option value="inactive">未生效</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="keyword">关键字</label>
+                            <input type="text" id="keyword" class="search-input" placeholder="输入标准名称、文号等关键字">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button class="btn-reset" id="resetFilter">
+                            <i class="fas fa-redo-alt"></i> 重置
+                        </button>
+                        <button class="btn-filter" id="applyFilter">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 数据卡片区域 -->
+                <div class="data-cards">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-primary">
+                                <i class="fas fa-list-ol"></i>
+                            </div>
+                            <div class="card-title">标准总数</div>
+                        </div>
+                        <div class="card-value">126</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长8%</span>
+                        </div>
+                        <div class="card-unit">条</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="card-title">已生效标准</div>
+                        </div>
+                        <div class="card-value">108</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长6%</span>
+                        </div>
+                        <div class="card-unit">条</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-info">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="card-title">覆盖区域数</div>
+                        </div>
+                        <div class="card-value">32</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长3个</span>
+                        </div>
+                        <div class="card-unit">个</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-warning">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="card-title">待更新标准</div>
+                        </div>
+                        <div class="card-value">6</div>
+                        <div class="card-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>较上月减少2个</span>
+                        </div>
+                        <div class="card-unit">条</div>
+                    </div>
+                </div>
+                
+                <!-- 表格区域 -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">补偿标准列表</div>
+                        <div class="table-actions">
+                            <button class="table-action-button" id="publishSelectedBtn">
+                                <i class="fas fa-check"></i>
+                                批量启用
+                            </button>
+                            <button class="table-action-button" id="unpublishSelectedBtn">
+                                <i class="fas fa-ban"></i>
+                                批量禁用
+                            </button>
+                            <button class="table-action-button" id="deleteSelectedBtn">
+                                <i class="fas fa-trash-alt"></i>
+                                批量删除
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th width="40">
+                                        <input type="checkbox" class="table-checkbox" id="selectAll">
+                                    </th>
+                                    <th>标准名称</th>
+                                    <th>补偿类型</th>
+                                    <th>适用区域</th>
+                                    <th>补偿标准</th>
+                                    <th>生效日期</th>
+                                    <th>失效日期</th>
+                                    <th>发布文号</th>
+                                    <th>版本</th>
+                                    <th>状态</th>
+                                    <th>备注</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>湖北省征地补偿标准（2023版）</td>
+                                    <td>
+                                        <span class="compensation-type-badge compensation-type-land">征地补偿</span>
+                                    </td>
+                                    <td>
+                                        <div class="region-hierarchy">
+                                            湖北省
+                                            <span class="region-level">省</span>
+                                        </div>
+                                    </td>
+                                    <td class="amount">30,000-80,000元/亩</td>
+                                    <td>2023-01-01</td>
+                                    <td>2028-12-31</td>
+                                    <td>鄂政发[2022]35号</td>
+                                    <td>V3.0</td>
+                                    <td>
+                                        <div class="effective-status">
+                                            <div class="status-dot active"></div>
+                                            <span>已生效</span>
+                                        </div>
+                                    </td>
+                                    <td>湖北省最新征地补偿标准</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action copy" title="复制">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>武汉市房屋拆迁补偿标准（2022版）</td>
+                                    <td>
+                                        <span class="compensation-type-badge compensation-type-house">房屋补偿</span>
+                                    </td>
+                                    <td>
+                                        <div class="region-hierarchy">
+                                            湖北省 > 武汉市
+                                            <span class="region-level">市</span>
+                                        </div>
+                                    </td>
+                                    <td class="amount">8,000-15,000元/㎡</td>
+                                    <td>2022-07-01</td>
+                                    <td>2027-06-30</td>
+                                    <td>武政规[2022]10号</td>
+                                    <td>V2.5</td>
+                                    <td>
+                                        <div class="effective-status">
+                                            <div class="status-dot active"></div>
+                                            <span>已生效</span>
+                                        </div>
+                                    </td>
+                                    <td>武汉市房屋拆迁补偿标准</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action copy" title="复制">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>湖北省附着物补偿标准（2023版）</td>
+                                    <td>
+                                        <span class="compensation-type-badge compensation-type-attachment">附着物补偿</span>
+                                    </td>
+                                    <td>
+                                        <div class="region-hierarchy">
+                                            湖北省
+                                            <span class="region-level">省</span>
+                                        </div>
+                                    </td>
+                                    <td class="amount">500-20,000元/项</td>
+                                    <td>2023-01-01</td>
+                                    <td>2028-12-31</td>
+                                    <td>鄂政发[2022]36号</td>
+                                    <td>V3.0</td>
+                                    <td>
+                                        <div class="effective-status">
+                                            <div class="status-dot active"></div>
+                                            <span>已生效</span>
+                                        </div>
+                                    </td>
+                                    <td>湖北省附着物补偿标准</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action copy" title="复制">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>湖北省临时用地补偿标准（2022版）</td>
+                                    <td>
+                                        <span class="compensation-type-badge compensation-type-other">其他补偿</span>
+                                    </td>
+                                    <td>
+                                        <div class="region-hierarchy">
+                                            湖北省
+                                            <span class="region-level">省</span>
+                                        </div>
+                                    </td>
+                                    <td class="amount">2,000-5,000元/亩·年</td>
+                                    <td>2022-04-01</td>
+                                    <td>2027-03-31</td>
+                                    <td>鄂自然资规[2022]5号</td>
+                                    <td>V2.0</td>
+                                    <td>
+                                        <div class="effective-status">
+                                            <div class="status-dot active"></div>
+                                            <span>已生效</span>
+                                        </div>
+                                    </td>
+                                    <td>湖北省临时用地补偿标准</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action copy" title="复制">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>黄石市征地补偿标准（2023版）</td>
+                                    <td>
+                                        <span class="compensation-type-badge compensation-type-land">征地补偿</span>
+                                    </td>
+                                    <td>
+                                        <div class="region-hierarchy">
+                                            湖北省 > 黄石市
+                                            <span class="region-level">市</span>
+                                        </div>
+                                    </td>
+                                    <td class="amount">35,000-75,000元/亩</td>
+                                    <td>2023-02-01</td>
+                                    <td>2028-01-31</td>
+                                    <td>黄政发[2022]28号</td>
+                                    <td>V2.8</td>
+                                    <td>
+                                        <div class="effective-status">
+                                            <div class="status-dot active"></div>
+                                            <span>已生效</span>
+                                        </div>
+                                    </td>
+                                    <td>黄石市征地补偿标准</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action copy" title="复制">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>湖北省征地补偿标准（2021版）</td>
+                                    <td>
+                                        <span class="compensation-type-badge compensation-type-land">征地补偿</span>
+                                    </td>
+                                    <td>
+                                        <div class="region-hierarchy">
+                                            湖北省
+                                            <span class="region-level">省</span>
+                                        </div>
+                                    </td>
+                                    <td class="amount">28,000-75,000元/亩</td>
+                                    <td>2021-01-01</td>
+                                    <td>2022-12-31</td>
+                                    <td>鄂政发[2020]32号</td>
+                                    <td>V2.5</td>
+                                    <td>
+                                        <div class="effective-status">
+                                            <div class="status-dot inactive"></div>
+                                            <span>未生效</span>
+                                        </div>
+                                    </td>
+                                    <td>旧版标准，已失效</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action copy" title="复制">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>武汉市江夏区房屋拆迁补偿标准（2023版）</td>
+                                    <td>
+                                        <span class="compensation-type-badge compensation-type-house">房屋补偿</span>
+                                    </td>
+                                    <td>
+                                        <div class="region-hierarchy">
+                                            湖北省 > 武汉市 > 江夏区
+                                            <span class="region-level">区</span>
+                                        </div>
+                                    </td>
+                                    <td class="amount">6,500-12,000元/㎡</td>
+                                    <td>2023-04-01</td>
+                                    <td>2028-03-31</td>
+                                    <td>夏政规[2023]5号</td>
+                                    <td>V2.0</td>
+                                    <td>
+                                        <div class="effective-status">
+                                            <div class="status-dot active"></div>
+                                            <span>已生效</span>
+                                        </div>
+                                    </td>
+                                    <td>江夏区房屋拆迁补偿标准</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action copy" title="复制">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>湖北省搬迁补偿标准（2023版）</td>
+                                    <td>
+                                        <span class="compensation-type-badge compensation-type-other">其他补偿</span>
+                                    </td>
+                                    <td>
+                                        <div class="region-hierarchy">
+                                            湖北省
+                                            <span class="region-level">省</span>
+                                        </div>
+                                    </td>
+                                    <td class="amount">3,000-8,000元/户</td>
+                                    <td>2023-06-01</td>
+                                    <td>2028-05-31</td>
+                                    <td>鄂住建发[2023]12号</td>
+                                    <td>V1.0</td>
+                                    <td>
+                                        <div class="effective-status">
+                                            <div class="status-dot inactive"></div>
+                                            <span>未生效</span>
+                                        </div>
+                                    </td>
+                                    <td>新制定的搬迁补偿标准，即将生效</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action copy" title="复制">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 分页区域 -->
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            显示 1-8 条，共 126 条
+                        </div>
+                        
+                        <div class="pagination-controls">
+                            <button class="pagination-button" disabled>
+                                <i class="fas fa-angle-left"></i>
+                            </button>
+                            <button class="pagination-button active">1</button>
+                            <button class="pagination-button">2</button>
+                            <button class="pagination-button">3</button>
+                            <button class="pagination-button">4</button>
+                            <button class="pagination-button">5</button>
+                            <button class="pagination-button">
+                                <i class="fas fa-angle-right"></i>
+                            </button>
+                            <select class="pagination-select">
+                                <option value="10">10条/页</option>
+                                <option value="20">20条/页</option>
+                                <option value="50">50条/页</option>
+                                <option value="100">100条/页</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 侧边栏切换功能
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const topNav = document.getElementById('topNav');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            topNav.classList.toggle('expanded');
+            
+            // 更新切换按钮图标
+            if (sidebar.classList.contains('collapsed')) {
+                sidebarToggle.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            } else {
+                sidebarToggle.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            }
+        }
+        
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('expanded');
+        }
+        
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+        
+        // 搜索和筛选功能
+        const applyFilter = document.getElementById('applyFilter');
+        const resetFilter = document.getElementById('resetFilter');
+        
+        applyFilter.addEventListener('click', function() {
+            alert('搜索条件已应用，正在加载数据...');
+            // 这里可以添加搜索和筛选的逻辑
+        });
+        
+        resetFilter.addEventListener('click', function() {
+            // 重置所有搜索条件
+            document.getElementById('province').value = '';
+            document.getElementById('city').value = '';
+            document.getElementById('district').value = '';
+            document.getElementById('standardType').value = '';
+            document.getElementById('effectiveStatus').value = '';
+            document.getElementById('keyword').value = '';
+        });
+        
+        // 表格操作功能
+        const selectAll = document.getElementById('selectAll');
+        const tableCheckboxes = document.querySelectorAll('.table-checkbox:not(#selectAll)');
+        
+        selectAll.addEventListener('change', function() {
+            const isChecked = this.checked;
+            tableCheckboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+        });
+        
+        // 批量操作按钮
+        const publishSelectedBtn = document.getElementById('publishSelectedBtn');
+        const unpublishSelectedBtn = document.getElementById('unpublishSelectedBtn');
+        const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+        
+        publishSelectedBtn.addEventListener('click', function() {
+            // 检查是否有选中的记录
+            let hasSelected = false;
+            
+            tableCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    hasSelected = true;
+                }
+            });
+            
+            if (hasSelected) {
+                if (confirm('确定要启用选中的补偿标准吗？')) {
+                    alert('选中的补偿标准已启用');
+                    // 这里可以添加批量启用的逻辑
+                }
+            } else {
+                alert('请至少选择一条记录');
+            }
+        });
+        
+        unpublishSelectedBtn.addEventListener('click', function() {
+            // 检查是否有选中的记录
+            let hasSelected = false;
+            
+            tableCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    hasSelected = true;
+                }
+            });
+            
+            if (hasSelected) {
+                if (confirm('确定要禁用选中的补偿标准吗？')) {
+                    alert('选中的补偿标准已禁用');
+                    // 这里可以添加批量禁用的逻辑
+                }
+            } else {
+                alert('请至少选择一条记录');
+            }
+        });
+        
+        deleteSelectedBtn.addEventListener('click', function() {
+            // 检查是否有选中的记录
+            let hasSelected = false;
+            
+            tableCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    hasSelected = true;
+                }
+            });
+            
+            if (hasSelected) {
+                if (confirm('确定要删除选中的补偿标准吗？删除后将无法恢复。')) {
+                    alert('选中的补偿标准已删除');
+                    // 这里可以添加批量删除的逻辑
+                }
+            } else {
+                alert('请至少选择一条记录');
+            }
+        });
+        
+        // 表格行操作按钮
+        const tableActionButtons = document.querySelectorAll('.table-action');
+        
+        tableActionButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const actionType = this.classList.contains('view') ? '查看' : 
+                                   this.classList.contains('edit') ? '编辑' : 
+                                   this.classList.contains('delete') ? '删除' : '复制';
+                
+                if (actionType === '删除') {
+                    if (confirm('确定要删除这条补偿标准吗？删除后将无法恢复。')) {
+                        alert('补偿标准已删除');
+                        // 这里可以添加删除记录的逻辑
+                    }
+                } else if (actionType === '复制') {
+                    alert('补偿标准已复制为新草稿');
+                    // 这里可以添加复制补偿标准的逻辑
+                } else if (actionType === '编辑') {
+                    alert('跳转到补偿标准编辑页面');
+                    // 这里可以添加跳转到编辑页面的逻辑
+                } else {
+                    alert(`执行${actionType}操作`);
+                }
+            });
+        });
+        
+        // 顶部操作按钮
+        const addStandardBtn = document.getElementById('addStandardBtn');
+        const importStandardBtn = document.getElementById('importStandardBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const compareBtn = document.getElementById('compareBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        
+        addStandardBtn.addEventListener('click', function() {
+            alert('跳转到新增补偿标准页面');
+            // 这里可以添加跳转到新增页面的逻辑
+        });
+        
+        importStandardBtn.addEventListener('click', function() {
+            alert('打开补偿标准导入对话框');
+            // 这里可以添加打开导入对话框的逻辑
+        });
+        
+        exportBtn.addEventListener('click', function() {
+            // 检查是否有选中的记录
+            let hasSelected = false;
+            
+            tableCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    hasSelected = true;
+                }
+            });
+            
+            if (hasSelected) {
+                alert('开始导出选中的补偿标准，请稍候...');
+                // 这里可以添加导出选中补偿标准的逻辑
+            } else {
+                alert('开始导出所有补偿标准，请稍候...');
+                // 这里可以添加导出所有补偿标准的逻辑
+            }
+        });
+        
+        compareBtn.addEventListener('click', function() {
+            // 检查是否有选中的记录
+            let hasSelected = false;
+            let selectedCount = 0;
+            
+            tableCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    hasSelected = true;
+                    selectedCount++;
+                }
+            });
+            
+            if (hasSelected && selectedCount >= 2) {
+                alert('打开补偿标准比较对话框');
+                // 这里可以添加打开比较对话框的逻辑
+            } else {
+                alert('请至少选择两条补偿标准进行比较');
+            }
+        });
+        
+        refreshBtn.addEventListener('click', function() {
+            // 添加刷新动画
+            this.querySelector('i').classList.add('fa-spin');
+            
+            // 模拟刷新操作
+            setTimeout(() => {
+                this.querySelector('i').classList.remove('fa-spin');
+                alert('数据已刷新');
+            }, 1000);
+        });
+        
+        // 分页控件
+        const paginationButtons = document.querySelectorAll('.pagination-button:not(:disabled)');
+        const paginationSelect = document.querySelector('.pagination-select');
+        
+        paginationButtons.forEach(button => {
+            if (!button.classList.contains('active')) {
+                button.addEventListener('click', function() {
+                    // 移除所有活动状态
+                    document.querySelectorAll('.pagination-button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    // 添加当前活动状态
+                    this.classList.add('active');
+                    
+                    // 如果是上一页或下一页按钮
+                    if (this.querySelector('i')) {
+                        // 这里可以添加翻页逻辑
+                        alert('切换到下一页数据');
+                    }
+                });
+            }
+        });
+        
+        paginationSelect.addEventListener('change', function() {
+            const pageSize = this.value;
+            alert(`每页显示${pageSize}条数据`);
+            // 这里可以添加改变每页显示数量的逻辑
+        });
+        
+        // 响应式处理
+        function handleResize() {
+            const width = window.innerWidth;
+            
+            // 在移动设备上默认收起侧边栏
+            if (width < 768) {
+                sidebar.classList.remove('expanded');
+            } else {
+                sidebar.classList.add('expanded');
+            }
+        }
+        
+        // 初始化响应式处理
+        handleResize();
+        // 监听窗口大小变化
+        window.addEventListener('resize', handleResize);
+        
+        // 省份和城市联动
+        const provinceSelect = document.getElementById('province');
+        const citySelect = document.getElementById('city');
+        const districtSelect = document.getElementById('district');
+        
+        provinceSelect.addEventListener('change', function() {
+            const province = this.value;
+            // 清空城市和区县选项
+            citySelect.innerHTML = '<option value="">全部城市</option>';
+            districtSelect.innerHTML = '<option value="">全部区县</option>';
+            
+            if (province === 'hubei') {
+                // 添加湖北省的城市选项
+                const cities = [
+                    { value: 'wuhan', name: '武汉市' },
+                    { value: 'xianning', name: '咸宁市' },
+                    { value: 'huangshi', name: '黄石市' },
+                    { value: 'jingzhou', name: '荆州市' },
+                    { value: 'yichang', name: '宜昌市' }
+                ];
+                
+                cities.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city.value;
+                    option.textContent = city.name;
+                    citySelect.appendChild(option);
+                });
+            }
+        });
+        
+        citySelect.addEventListener('change', function() {
+            const city = this.value;
+            // 清空区县选项
+            districtSelect.innerHTML = '<option value="">全部区县</option>';
+            
+            if (city === 'wuhan') {
+                // 添加武汉市的区县选项
+                const districts = [
+                    { value: 'jiangxia', name: '江夏区' },
+                    { value: 'hongshan', name: '洪山区' },
+                    { value: 'wuchang', name: '武昌区' },
+                    { value: 'qiaokou', name: '硚口区' }
+                ];
+                
+                districts.forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district.value;
+                    option.textContent = district.name;
+                    districtSelect.appendChild(option);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

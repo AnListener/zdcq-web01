@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高速公路征地拆迁管理系统 - {页面标题}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <!-- 引入侧边栏组件样式 -->
+    <link rel="stylesheet" href="components/sidebar.css">
+    <style>
+        /* 通用页面样式 */
+        .{页面ID}-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 主内容区样式 */
+        .main-content {
+            flex: 1;
+            margin-left: 240px;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .main-content.expanded {
+            margin-left: 64px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .main-content.expanded {
+                margin-left: 0;
+            }
+        }
+        
+        /* 顶部导航栏样式 */
+        .top-nav {
+            height: 64px;
+            background-color: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 240px;
+            z-index: 90;
+            transition: left 0.3s ease;
+        }
+        
+        .top-nav.expanded {
+            left: 64px;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--dark);
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .top-nav {
+                left: 0;
+            }
+            
+            .top-nav.expanded {
+                left: 0;
+            }
+        }
+        
+        .nav-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            position: relative;
+        }
+        
+        .nav-item:hover {
+            background-color: var(--bg-light);
+        }
+        
+        /* 内容区样式 */
+        .content-wrapper {
+            padding: 80px 24px 24px;
+        }
+        
+        /* 页面特定样式 */
+        /* 请在具体页面中添加特定样式 */
+    </style>
+</head>
+<body>
+    <div class="{页面ID}-container">
+        <!-- 引入侧边栏组件 -->
+        <div id="sidebar-container"></div>
+        
+        <!-- 主内容区 -->
+        <main class="main-content" id="mainContent">
+            <!-- 顶部导航栏 -->
+            <header class="top-nav" id="topNav">
+                <div class="nav-left">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="nav-title">{页面标题}</h1>
+                </div>
+                <div class="nav-right">
+                    <div class="nav-item">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </div>
+                    <div class="nav-item">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="nav-item">
+                        <img src="https://picsum.photos/id/1005/200" alt="用户头像" class="nav-avatar">
+                    </div>
+                </div>
+            </header>
+            
+            <!-- 内容区域 -->
+            <div class="content-wrapper">
+                <!-- 页面具体内容 -->
+            </div>
+        </main>
+    </div>
+
+    <!-- 引入侧边栏组件HTML -->
+    <script>
+        // 加载侧边栏组件
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarContainer = document.getElementById('sidebar-container');
+            
+            // 加载侧边栏HTML
+            fetch('components/sidebar.html')
+                .then(response => response.text())
+                .then(html => {
+                    sidebarContainer.innerHTML = html;
+                    
+                    // 加载侧边栏JavaScript
+                    const sidebarScript = document.createElement('script');
+                    sidebarScript.src = 'components/sidebar.js';
+                    document.body.appendChild(sidebarScript);
+                    
+                    // 侧边栏状态变化监听
+                    document.addEventListener('sidebarToggle', function(e) {
+                        const mainContent = document.getElementById('mainContent');
+                        const topNav = document.getElementById('topNav');
+                        
+                        if (e.detail.collapsed) {
+                            mainContent.classList.add('expanded');
+                            topNav.classList.add('expanded');
+                        } else {
+                            mainContent.classList.remove('expanded');
+                            topNav.classList.remove('expanded');
+                        }
+                    });
+                    
+                    // 移动端菜单切换监听
+                    document.addEventListener('sidebarMobileToggle', function(e) {
+                        const mainContent = document.getElementById('mainContent');
+                        const topNav = document.getElementById('topNav');
+                        
+                        if (e.detail.visible) {
+                            mainContent.style.display = 'none';
+                        } else {
+                            mainContent.style.display = 'block';
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('加载侧边栏组件失败:', error);
+                });
+        });
+    </script>
+</body>
+</html>

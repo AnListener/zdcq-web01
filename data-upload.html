@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测绘数据上传 - 高速公路征地拆迁管理系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 基础样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            color: #333;
+            background-color: #f5f7fa;
+            line-height: 1.5;
+        }
+        
+        /* 侧边栏样式 */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background-color: #2d3748;
+            color: #e2e8f0;
+            transition: width 0.3s ease;
+            z-index: 2000;
+            overflow-y: auto;
+        }
+        
+        .sidebar.collapsed {
+            width: 64px;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #4a5568;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 64px;
+        }
+        
+        .sidebar-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+        
+        .sidebar.collapsed .sidebar-header h2 {
+            display: none;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .menu-item {
+            position: relative;
+        }
+        
+        .menu-title {
+            padding: 12px 20px;
+            font-size: 12px;
+            color: #a0aec0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        
+        .sidebar.collapsed .menu-title {
+            display: none;
+        }
+        
+        .menu-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #e2e8f0;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .menu-link:hover {
+            background-color: #4a5568;
+            color: #ffffff;
+        }
+        
+        .menu-link.active {
+            background-color: #3182ce;
+            color: #ffffff;
+        }
+        
+        .menu-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background-color: #ffffff;
+        }
+        
+        .menu-icon {
+            font-size: 18px;
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .menu-text {
+            flex: 1;
+        }
+        
+        .sidebar.collapsed .menu-text {
+            display: none;
+        }
+        
+        /* 主内容区域 */
+        .main-content {
+            margin-left: 240px;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content.sidebar-collapsed {
+            margin-left: 64px;
+        }
+        
+        /* 顶部导航栏 */
+        .header {
+            height: 64px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar-toggle {
+            font-size: 20px;
+            cursor: pointer;
+            color: #4a5568;
+            background: none;
+            border: none;
+            padding: 8px;
+            margin-right: 16px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar-toggle:hover {
+            background-color: #f7fafc;
+            color: #3182ce;
+        }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .header-action {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .header-button {
+            padding: 8px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            background-color: #ffffff;
+            color: #4a5568;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .header-button:hover {
+            border-color: #cbd5e0;
+            background-color: #f7fafc;
+        }
+        
+        .header-button.primary {
+            background-color: #3182ce;
+            color: #ffffff;
+            border-color: #3182ce;
+        }
+        
+        .header-button.primary:hover {
+            background-color: #2c5aa0;
+            border-color: #2c5aa0;
+        }
+        
+        .header-button.danger {
+            background-color: #e53e3e;
+            color: #ffffff;
+            border-color: #e53e3e;
+        }
+        
+        .header-button.danger:hover {
+            background-color: #c53030;
+            border-color: #c53030;
+        }
+        
+        .notification {
+            position: relative;
+            font-size: 20px;
+            color: #4a5568;
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background-color: #e53e3e;
+            color: #ffffff;
+            font-size: 10px;
+            padding: 2px 4px;
+            border-radius: 8px;
+            min-width: 16px;
+            text-align: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #3182ce;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2d3748;
+        }
+        
+        .user-role {
+            font-size: 12px;
+            color: #718096;
+        }
+        
+        /* 页面内容容器 */
+        .content-wrapper {
+            flex: 1;
+            padding: 24px;
+        }
+        
+        /* 页面标题区域 */
+        .page-header {
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            font-size: 14px;
+            color: #718096;
+        }
+        
+        /* 统计卡片容器 */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        /* 统计卡片 */
+        .stat-card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .stat-card-title {
+            font-size: 14px;
+            color: #718096;
+            font-weight: 500;
+        }
+        
+        .stat-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #ffffff;
+        }
+        
+        .stat-card-icon.primary {
+            background-color: #3182ce;
+        }
+        
+        .stat-card-icon.success {
+            background-color: #38a169;
+        }
+        
+        .stat-card-icon.warning {
+            background-color: #dd6b20;
+        }
+        
+        .stat-card-icon.danger {
+            background-color: #e53e3e;
+        }
+        
+        .stat-card-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card-trend {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .stat-card-trend.positive {
+            color: #38a169;
+        }
+        
+        .stat-card-trend.negative {
+            color: #e53e3e;
+        }
+        
+        /* 表单样式 */
+        .form-section {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 6px;
+        }
+        
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #2d3748;
+            background-color: #ffffff;
+            transition: border-color 0.2s ease;
+        }
+        
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+        
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        /* 文件上传区域 */
+        .upload-area {
+            border: 2px dashed #e2e8f0;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: #f7fafc;
+            margin-bottom: 16px;
+        }
+        
+        .upload-area:hover {
+            border-color: #3182ce;
+            background-color: #edf2f7;
+        }
+        
+        .upload-area-icon {
+            font-size: 48px;
+            color: #cbd5e0;
+            margin-bottom: 16px;
+        }
+        
+        .upload-area:hover .upload-area-icon {
+            color: #3182ce;
+        }
+        
+        .upload-area-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+        
+        .upload-area-subtitle {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 16px;
+        }
+        
+        .upload-area-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #3182ce;
+            color: #ffffff;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .upload-area-button:hover {
+            background-color: #2c5aa0;
+        }
+        
+        .upload-area input[type="file"] {
+            display: none;
+        }
+        
+        /* 上传提示 */
+        .upload-tips {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .upload-tips-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .upload-tips-content {
+            font-size: 13px;
+            color: #718096;
+            line-height: 1.6;
+        }
+        
+        .upload-tips-content ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+        
+        .upload-tips-content li {
+            margin-bottom: 4px;
+        }
+        
+        /* 文件列表 */
+        .file-list {
+            margin-bottom: 24px;
+        }
+        
+        .file-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .file-list-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        /* 表格样式 */
+        .table-wrapper {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background-color: #f7fafc;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 14px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .data-table td {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #2d3748;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .data-table tr:hover {
+            background-color: #f7fafc;
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* 文件状态样式 */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-badge.success {
+            background-color: #c6f6d5;
+            color: #276749;
+        }
+        
+        .status-badge.warning {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+        
+        .status-badge.pending {
+            background-color: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .status-badge.processing {
+            background-color: #bee3f8;
+            color: #2c5aa0;
+        }
+        
+        /* 操作按钮组 */
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .action-button {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            background-color: transparent;
+            color: #4a5568;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .action-button:hover {
+            background-color: #f7fafc;
+            color: #3182ce;
+        }
+        
+        .action-button.danger:hover {
+            background-color: #fed7d7;
+            color: #e53e3e;
+        }
+        
+        /* 分页控件 */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background-color: #ffffff;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .pagination-info {
+            font-size: 14px;
+            color: #718096;
+        }
+        
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .pagination-button {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            background-color: #ffffff;
+            color: #4a5568;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .pagination-button:hover:not(:disabled) {
+            border-color: #cbd5e0;
+            background-color: #f7fafc;
+        }
+        
+        .pagination-button.active {
+            background-color: #3182ce;
+            color: #ffffff;
+            border-color: #3182ce;
+        }
+        
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-select {
+            padding: 6px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            background-color: #ffffff;
+            color: #4a5568;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .pagination-select:focus {
+            outline: none;
+            border-color: #3182ce;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 64px;
+            }
+            
+            .main-content {
+                margin-left: 64px;
+            }
+            
+            .sidebar.collapsed {
+                width: 0;
+                transform: translateX(-100%);
+            }
+            
+            .main-content.sidebar-collapsed {
+                margin-left: 0;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 0 16px;
+            }
+            
+            .content-wrapper {
+                padding: 16px;
+            }
+            
+            .table-wrapper {
+                overflow-x: auto;
+            }
+            
+            .pagination {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏导航 -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>高速公路征地拆迁管理系统</h2>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <div class="menu-title">GIS数据管理</div>
+            <a href="#" class="menu-link active">
+                <span class="menu-icon"><i class="fas fa-upload"></i></span>
+                <span class="menu-text">测绘数据上传</span>
+            </a>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-map-marked-alt"></i></span>
+                <span class="menu-text">GIS发布</span>
+            </a>
+            
+            <div class="menu-title">台账管理</div>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-database"></i></span>
+                <span class="menu-text">GIS台账</span>
+            </a>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-landmark"></i></span>
+                <span class="menu-text">征地台账</span>
+            </a>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-home"></i></span>
+                <span class="menu-text">房屋台账</span>
+            </a>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-tools"></i></span>
+                <span class="menu-text">附着物台账</span>
+            </a>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-check-circle"></i></span>
+                <span class="menu-text">审核台账</span>
+            </a>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-file-contract"></i></span>
+                <span class="menu-text">协议台账</span>
+            </a>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-calculator"></i></span>
+                <span class="menu-text">结算台账</span>
+            </a>
+            
+            <div class="menu-title">基础配置管理</div>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-file-alt"></i></span>
+                <span class="menu-text">表单协议模版管理</span>
+            </a>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-project-diagram"></i></span>
+                <span class="menu-text">流程配置</span>
+            </a>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-money-bill-wave"></i></span>
+                <span class="menu-text">区域补偿标准库</span>
+            </a>
+            
+            <div class="menu-title">统计分析</div>
+            <a href="project-stats.html" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-chart-bar"></i></span>
+                <span class="menu-text">项目统计</span>
+            </a>
+            <a href="group-stats.html" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-chart-pie"></i></span>
+                <span class="menu-text">集团统计</span>
+            </a>
+            
+            <div class="menu-title">系统管理</div>
+            <a href="user-role.html" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-users-cog"></i></span>
+                <span class="menu-text">用户角色管理</span>
+            </a>
+            <a href="project-authorization.html" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-key"></i></span>
+                <span class="menu-text">项目授权管理</span>
+            </a>
+            
+            <div class="menu-title">辅助支持管理</div>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-play-circle"></i></span>
+                <span class="menu-text">功能演示入口</span>
+            </a>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-book"></i></span>
+                <span class="menu-text">培训资料</span>
+            </a>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-question-circle"></i></span>
+                <span class="menu-text">操作手册</span>
+            </a>
+        </nav>
+    </aside>
+    
+    <!-- 主内容区域 -->
+    <main class="main-content">
+        <!-- 顶部导航栏 -->
+        <header class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="header-title">测绘数据上传</h1>
+            </div>
+            
+            <div class="header-right">
+                <div class="header-action">
+                    <button class="header-button" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>刷新</span>
+                    </button>
+                    <button class="header-button primary" id="batchUploadBtn">
+                        <i class="fas fa-upload"></i>
+                        <span>批量上传</span>
+                    </button>
+                </div>
+                
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">张管理员</div>
+                        <div class="user-role">系统管理员</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- 页面内容容器 -->
+        <div class="content-wrapper">
+            <!-- 页面标题区域 -->
+            <div class="page-header">
+                <h2 class="page-title">测绘数据上传</h2>
+                <p class="page-subtitle">上传各类测绘数据文件，支持批量上传和进度跟踪</p>
+            </div>
+            
+            <!-- 统计卡片容器 -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-card-title">今日上传量</span>
+                        <div class="stat-card-icon primary">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card-value">24</div>
+                    <div class="stat-card-trend positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>较昨日增长 12%</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-card-title">总文件数</span>
+                        <div class="stat-card-icon success">
+                            <i class="fas fa-database"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card-value">1,286</div>
+                    <div class="stat-card-trend positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>本月新增 142 个</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-card-title">存储占用</span>
+                        <div class="stat-card-icon warning">
+                            <i class="fas fa-hdd"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card-value">456 GB</div>
+                    <div class="stat-card-trend positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>较上月增加 23 GB</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-card-title">上传失败</span>
+                        <div class="stat-card-icon danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                    <div class="stat-card-value">3</div>
+                    <div class="stat-card-trend negative">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>较昨日减少 2 个</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 数据上传表单 -->
+            <div class="form-section">
+                <h3 class="form-title">
+                    <i class="fas fa-file-upload"></i>
+                    上传数据文件
+                </h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">项目名称</label>
+                        <select class="form-select" required>
+                            <option value="">请选择项目</option>
+                            <option value="proj001">京沪高速公路扩建工程</option>
+                            <option value="proj002">京台高速山东段建设项目</option>
+                            <option value="proj003">京港澳高速湖北段改造工程</option>
+                            <option value="proj004">沈海高速江苏段拓宽工程</option>
+                            <option value="proj005">沪杭高速浙江段改造工程</option>
+                            <option value="proj006">长深高速江苏段建设项目</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">标段</label>
+                        <select class="form-select" required>
+                            <option value="">请选择标段</option>
+                            <option value="all">全标段</option>
+                            <option value="1">第1标段</option>
+                            <option value="2">第2标段</option>
+                            <option value="3">第3标段</option>
+                            <option value="4">第4标段</option>
+                            <option value="5">第5标段</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">数据类型</label>
+                        <select class="form-select" required>
+                            <option value="">请选择数据类型</option>
+                            <option value="dem">DEM数据</option>
+                            <option value="dom">DOM数据</option>
+                            <option value="dlg">DLG数据</option>
+                            <option value="drg">DRG数据</option>
+                            <option value="cad">CAD图纸</option>
+                            <option value="vector">矢量数据</option>
+                            <option value="document">文档资料</option>
+                            <option value="other">其他数据</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">坐标系</label>
+                        <select class="form-select" required>
+                            <option value="">请选择坐标系</option>
+                            <option value="gcj02">GCJ-02 (国测局坐标系)</option>
+                            <option value="bd09">BD-09 (百度坐标系)</option>
+                            <option value="wgs84">WGS-84 (世界大地坐标系)</option>
+                            <option value="cgcs2000">CGCS2000 (中国大地坐标系2000)</option>
+                            <option value="xian80">西安80坐标系</option>
+                            <option value="beijing54">北京54坐标系</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 文件上传区域 -->
+                <div class="form-group">
+                    <label class="form-label">选择文件</label>
+                    <label class="upload-area" for="fileUpload">
+                        <div class="upload-area-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-area-title">拖放文件到此处或点击上传</div>
+                        <div class="upload-area-subtitle">支持 .shp, .dwg, .dxf, .tif, .jpg, .pdf 等格式文件</div>
+                        <div class="upload-area-button">选择文件</div>
+                        <input type="file" id="fileUpload" accept=".shp,.dwg,.dxf,.tif,.jpg,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar" multiple>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">备注</label>
+                    <textarea class="form-textarea" placeholder="请输入文件备注信息（可选）"></textarea>
+                </div>
+                
+                <div class="form-action" style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button class="header-button" type="button" id="cancelUploadBtn">取消</button>
+                    <button class="header-button primary" type="button" id="confirmUploadBtn">开始上传</button>
+                </div>
+            </div>
+            
+            <!-- 上传提示 -->
+            <div class="upload-tips">
+                <div class="upload-tips-title">
+                    <i class="fas fa-info-circle"></i>
+                    上传须知
+                </div>
+                <div class="upload-tips-content">
+                    <p>为确保数据上传成功和系统运行稳定，请您注意以下事项：</p>
+                    <ul>
+                        <li>支持的文件格式：SHP、DWG、DXF、TIF、JPG、PDF、DOC、XLS、ZIP等</li>
+                        <li>单个文件大小不超过2GB，批量上传不超过10个文件</li>
+                        <li>上传前请确认文件命名规范，建议包含项目名称、标段号、数据类型等信息</li>
+                        <li>对于压缩文件，请确保内部文件结构清晰，文件名规范</li>
+                        <li>上传完成后，系统将自动进行数据解析和格式转换，转换时间根据文件大小而定</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- 文件上传列表 -->
+            <div class="file-list">
+                <div class="file-list-header">
+                    <h3 class="file-list-title">上传历史记录</h3>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>文件名称</th>
+                                <th>数据类型</th>
+                                <th>项目</th>
+                                <th>上传时间</th>
+                                <th>文件大小</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <i class="fas fa-file-archive text-blue-500"></i>
+                                        <span>京沪高速-第一标段-CAD图纸.zip</span>
+                                    </div>
+                                </td>
+                                <td>CAD图纸</td>
+                                <td>京沪高速公路扩建工程</td>
+                                <td>2023-12-20 09:30:45</td>
+                                <td>128 MB</td>
+                                <td><span class="status-badge success">已完成</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-button" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-button" title="下载">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                        <button class="action-button danger" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <i class="fas fa-file-image text-green-500"></i>
+                                        <span>京台高速-第二标段-DOM影像.tif</span>
+                                    </div>
+                                </td>
+                                <td>DOM数据</td>
+                                <td>京台高速山东段建设项目</td>
+                                <td>2023-12-19 15:22:18</td>
+                                <td>384 MB</td>
+                                <td><span class="status-badge success">已完成</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-button" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-button" title="下载">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                        <button class="action-button danger" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <i class="fas fa-file-excel text-green-600"></i>
+                                        <span>京港澳高速-第三标段-征地测量数据.xlsx</span>
+                                    </div>
+                                </td>
+                                <td>矢量数据</td>
+                                <td>京港澳高速湖北段改造工程</td>
+                                <td>2023-12-18 11:45:36</td>
+                                <td>4.5 MB</td>
+                                <td><span class="status-badge success">已完成</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-button" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-button" title="下载">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                        <button class="action-button danger" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <i class="fas fa-file-pdf text-red-500"></i>
+                                        <span>沈海高速-第四标段-测量报告.pdf</span>
+                                    </div>
+                                </td>
+                                <td>文档资料</td>
+                                <td>沈海高速江苏段拓宽工程</td>
+                                <td>2023-12-17 14:18:52</td>
+                                <td>3.8 MB</td>
+                                <td><span class="status-badge success">已完成</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-button" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-button" title="下载">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                        <button class="action-button danger" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <i class="fas fa-file-image text-green-500"></i>
+                                        <span>沪杭高速-第五标段-DEM数据.tif</span>
+                                    </div>
+                                </td>
+                                <td>DEM数据</td>
+                                <td>沪杭高速浙江段改造工程</td>
+                                <td>2023-12-16 10:25:14</td>
+                                <td>237 MB</td>
+                                <td><span class="status-badge warning">上传失败</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-button" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-button" title="重新上传">
+                                            <i class="fas fa-redo-alt"></i>
+                                        </button>
+                                        <button class="action-button danger" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <!-- 分页控件 -->
+                    <div class="pagination">
+                        <div class="pagination-info">
+                            显示 1-5 条，共 42 条
+                        </div>
+                        <div class="pagination-controls">
+                            <button class="pagination-button" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="pagination-button active">1</button>
+                            <button class="pagination-button">2</button>
+                            <button class="pagination-button">3</button>
+                            <button class="pagination-button">4</button>
+                            <button class="pagination-button">5</button>
+                            <button class="pagination-button">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <select class="pagination-select">
+                            <option value="5">5条/页</option>
+                            <option value="10">10条/页</option>
+                            <option value="20">20条/页</option>
+                            <option value="50">50条/页</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- 上传进度弹窗 -->
+    <div class="modal" id="uploadProgressModal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px; width: 90%; margin: 0 auto;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid #e2e8f0;">
+                <h3 class="modal-title" style="font-size: 18px; font-weight: 600; color: #2d3748;">文件上传中</h3>
+                <button class="modal-close" id="closeProgressModal" style="background: none; border: none; font-size: 20px; color: #718096; cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body" style="padding: 24px;">
+                <div class="upload-file-info" style="margin-bottom: 16px;">
+                    <div class="upload-file-name" style="font-size: 14px; color: #4a5568; margin-bottom: 4px;">京沪高速-第一标段-CAD图纸.zip</div>
+                    <div class="upload-file-size" style="font-size: 12px; color: #718096;">128 MB</div>
+                </div>
+                
+                <div class="progress-bar-container" style="width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden; margin-bottom: 16px;">
+                    <div class="progress-bar" style="width: 68%; height: 100%; background-color: #3182ce; border-radius: 4px; transition: width 0.3s ease;"></div>
+                </div>
+                
+                <div class="upload-progress-info" style="display: flex; justify-content: space-between; font-size: 12px; color: #718096;">
+                    <div class="upload-percentage">68%</div>
+                    <div class="upload-speed">3.2 MB/s</div>
+                    <div class="upload-remaining">剩余时间: 15秒</div>
+                </div>
+            </div>
+            
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; padding: 16px; border-top: 1px solid #e2e8f0;">
+                <button class="btn btn-secondary" id="cancelUploadProgress" style="padding: 8px 16px; border: 1px solid #e2e8f0; border-radius: 4px; background-color: #ffffff; color: #4a5568; cursor: pointer; font-size: 14px; margin-right: 8px;">取消</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 文件详情弹窗 -->
+    <div class="modal" id="fileDetailModal" style="display: none;">
+        <div class="modal-content" style="max-width: 700px; width: 90%; margin: 0 auto;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid #e2e8f0;">
+                <h3 class="modal-title" style="font-size: 18px; font-weight: 600; color: #2d3748;">文件详情</h3>
+                <button class="modal-close" id="closeDetailModal" style="background: none; border: none; font-size: 20px; color: #718096; cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body" style="padding: 24px;">
+                <div class="file-detail-info" style="margin-bottom: 24px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div style="width: 60px; height: 60px; border-radius: 8px; background-color: #edf2f7; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #3182ce;">
+                            <i class="fas fa-file-archive"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 16px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">京沪高速-第一标段-CAD图纸.zip</div>
+                            <div style="font-size: 12px; color: #718096;">上传时间: 2023-12-20 09:30:45</div>
+                        </div>
+                    </div>
+                    
+                    <div style="grid-template-columns: repeat(2, 1fr); gap: 16px; display: grid;">
+                        <div>
+                            <div style="font-size: 12px; color: #718096; margin-bottom: 4px;">数据类型</div>
+                            <div style="font-size: 14px; color: #2d3748;">CAD图纸</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: #718096; margin-bottom: 4px;">文件大小</div>
+                            <div style="font-size: 14px; color: #2d3748;">128 MB</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: #718096; margin-bottom: 4px;">项目名称</div>
+                            <div style="font-size: 14px; color: #2d3748;">京沪高速公路扩建工程</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: #718096; margin-bottom: 4px;">标段</div>
+                            <div style="font-size: 14px; color: #2d3748;">第1标段</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: #718096; margin-bottom: 4px;">坐标系</div>
+                            <div style="font-size: 14px; color: #2d3748;">CGCS2000 (中国大地坐标系2000)</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: #718096; margin-bottom: 4px;">上传人</div>
+                            <div style="font-size: 14px; color: #2d3748;">张管理员</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 14px; font-weight: 600; color: #4a5568; margin-bottom: 8px;">文件内容</div>
+                    <div style="background-color: #f7fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px; max-height: 200px; overflow-y: auto;">
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            <li style="display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+                                <i class="fas fa-file-draft text-blue-500"></i>
+                                <span style="font-size: 13px; color: #4a5568;">京沪高速-第一标段-征地范围.dwg</span>
+                            </li>
+                            <li style="display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+                                <i class="fas fa-file-draft text-blue-500"></i>
+                                <span style="font-size: 13px; color: #4a5568;">京沪高速-第一标段-房屋拆迁.dwg</span>
+                            </li>
+                            <li style="display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+                                <i class="fas fa-file-draft text-blue-500"></i>
+                                <span style="font-size: 13px; color: #4a5568;">京沪高速-第一标段-道路设计.dwg</span>
+                            </li>
+                            <li style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                                <i class="fas fa-file-excel text-green-600"></i>
+                                <span style="font-size: 13px; color: #4a5568;">京沪高速-第一标段-测量点数据.xlsx</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div>
+                    <div style="font-size: 14px; font-weight: 600; color: #4a5568; margin-bottom: 8px;">备注</div>
+                    <div style="background-color: #f7fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px; font-size: 13px; color: #4a5568;">
+                        第一标段征地范围和房屋拆迁CAD图纸，包含测量点数据，用于征地拆迁规划和实施。
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; padding: 16px; border-top: 1px solid #e2e8f0;">
+                <button class="btn btn-secondary" id="closeDetailBtn" style="padding: 8px 16px; border: 1px solid #e2e8f0; border-radius: 4px; background-color: #ffffff; color: #4a5568; cursor: pointer; font-size: 14px; margin-right: 8px;">关闭</button>
+                <button class="btn btn-primary" id="downloadFileBtn" style="padding: 8px 16px; border: 1px solid #3182ce; border-radius: 4px; background-color: #3182ce; color: #ffffff; cursor: pointer; font-size: 14px;">
+                    <i class="fas fa-download"></i>
+                    下载文件
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 确认对话框 -->
+    <div class="confirm-dialog" id="confirmDialog" style="display: none;">
+        <div class="confirm-dialog-content" style="max-width: 400px; width: 90%; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); overflow: hidden;">
+            <div class="confirm-dialog-header" style="padding: 16px; text-align: center; border-bottom: 1px solid #e2e8f0;">
+                <div class="confirm-dialog-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background-color: #fed7d7; color: #e53e3e; font-size: 20px; margin: 0 auto;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+            </div>
+            
+            <div class="confirm-dialog-message" style="padding: 24px; text-align: center; font-size: 14px; color: #4a5568;">
+                确定要删除选中的文件吗？此操作不可撤销。
+            </div>
+            
+            <div class="confirm-dialog-footer" style="display: flex; justify-content: center; padding: 16px; border-top: 1px solid #e2e8f0; gap: 12px;">
+                <button class="btn btn-secondary" id="cancelConfirm" style="padding: 8px 16px; border: 1px solid #e2e8f0; border-radius: 4px; background-color: #ffffff; color: #4a5568; cursor: pointer; font-size: 14px;">取消</button>
+                <button class="btn btn-danger" id="confirmAction" style="padding: 8px 16px; border: 1px solid #e53e3e; border-radius: 4px; background-color: #e53e3e; color: #ffffff; cursor: pointer; font-size: 14px;">确认删除</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 通知提示 -->
+    <div id="notification" style="position: fixed; top: 80px; right: 20px; background-color: #10b981; color: white; padding: 12px 20px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); display: none; z-index: 3000; transition: all 0.3s ease;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-check-circle"></i>
+            <span id="notificationMessage">操作成功</span>
+        </div>
+    </div>
+    
+    <script>
+        // 侧边栏切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const mainContent = document.querySelector('.main-content');
+            
+            // 侧边栏切换
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('sidebar-collapsed');
+            });
+            
+            // 文件上传区域交互
+            const fileUpload = document.getElementById('fileUpload');
+            const uploadArea = document.querySelector('.upload-area');
+            
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.backgroundColor = '#edf2f7';
+                this.style.borderColor = '#3182ce';
+            });
+            
+            uploadArea.addEventListener('dragleave', function() {
+                this.style.backgroundColor = '#f7fafc';
+                this.style.borderColor = '#e2e8f0';
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.backgroundColor = '#f7fafc';
+                this.style.borderColor = '#e2e8f0';
+                
+                if (e.dataTransfer.files.length) {
+                    console.log('拖放的文件数量:', e.dataTransfer.files.length);
+                    // 这里可以处理拖放的文件
+                }
+            });
+            
+            // 文件选择变化事件
+            fileUpload.addEventListener('change', function() {
+                if (this.files.length) {
+                    console.log('选择的文件数量:', this.files.length);
+                    // 这里可以处理选择的文件
+                }
+            });
+            
+            // 模态框控制
+            const modals = {
+                uploadProgress: document.getElementById('uploadProgressModal'),
+                fileDetail: document.getElementById('fileDetailModal'),
+                confirmDialog: document.getElementById('confirmDialog')
+            };
+            
+            // 打开模态框函数
+            function openModal(modalId) {
+                const modal = modals[modalId];
+                if (modal) {
+                    modal.style.display = 'flex';
+                    modal.style.position = 'fixed';
+                    modal.style.top = '0';
+                    left = '0';
+                    width = '100%';
+                    height = '100%';
+                    backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                    justifyContent = 'center';
+                    alignItems = 'center';
+                    zIndex = '2000';
+                    // 阻止背景滚动
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+            
+            // 关闭模态框函数
+            function closeModal(modalId) {
+                const modal = modals[modalId];
+                if (modal) {
+                    modal.style.display = 'none';
+                    // 恢复背景滚动
+                    document.body.style.overflow = 'auto';
+                }
+            }
+            
+            // 关闭所有模态框
+            function closeAllModals() {
+                Object.keys(modals).forEach(modalId => {
+                    closeModal(modalId);
+                });
+            }
+            
+            // 开始上传按钮事件
+            document.getElementById('confirmUploadBtn').addEventListener('click', function() {
+                // 检查是否选择了文件
+                if (!fileUpload.files.length) {
+                    alert('请选择要上传的文件');
+                    return;
+                }
+                
+                // 检查项目和标段是否选择
+                const projectSelect = document.querySelector('.form-select[required]:first-of-type');
+                const sectionSelect = document.querySelectorAll('.form-select[required]')[1];
+                
+                if (!projectSelect.value) {
+                    alert('请选择项目');
+                    return;
+                }
+                
+                if (!sectionSelect.value) {
+                    alert('请选择标段');
+                    return;
+                }
+                
+                // 显示上传进度弹窗
+                openModal('uploadProgress');
+                
+                // 模拟上传进度
+                simulateUploadProgress();
+            });
+            
+            // 模拟上传进度
+            function simulateUploadProgress() {
+                const progressBar = document.querySelector('.progress-bar');
+                const uploadPercentage = document.querySelector('.upload-percentage');
+                const uploadSpeed = document.querySelector('.upload-speed');
+                const uploadRemaining = document.querySelector('.upload-remaining');
+                
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        
+                        // 上传完成后显示成功通知
+                        setTimeout(() => {
+                            closeModal('uploadProgress');
+                            showNotification('文件上传成功');
+                        }, 500);
+                    }
+                    
+                    progressBar.style.width = progress + '%';
+                    uploadPercentage.textContent = Math.floor(progress) + '%';
+                    
+                    // 随机更新上传速度
+                    const speed = (Math.random() * 5 + 1).toFixed(1);
+                    uploadSpeed.textContent = speed + ' MB/s';
+                    
+                    // 计算剩余时间（模拟）
+                    const remainingSeconds = Math.floor((100 - progress) / (progress || 1));
+                    uploadRemaining.textContent = '剩余时间: ' + remainingSeconds + '秒';
+                }, 1000);
+            }
+            
+            // 取消上传按钮事件
+            document.getElementById('cancelUploadProgress').addEventListener('click', function() {
+                closeModal('uploadProgress');
+                showNotification('文件上传已取消', 'warning');
+            });
+            
+            // 关闭进度弹窗按钮事件
+            document.getElementById('closeProgressModal').addEventListener('click', function() {
+                closeModal('uploadProgress');
+            });
+            
+            // 取消上传按钮事件
+            document.getElementById('cancelUploadBtn').addEventListener('click', function() {
+                // 重置表单
+                fileUpload.value = '';
+                const formSelects = document.querySelectorAll('.form-select');
+                formSelects.forEach(select => {
+                    select.selectedIndex = 0;
+                });
+                const textarea = document.querySelector('.form-textarea');
+                textarea.value = '';
+            });
+            
+            // 批量上传按钮事件
+            document.getElementById('batchUploadBtn').addEventListener('click', function() {
+                showNotification('批量上传功能即将上线', 'info');
+            });
+            
+            // 刷新按钮事件
+            document.getElementById('refreshBtn').addEventListener('click', function() {
+                showNotification('页面已刷新');
+                // 这里可以添加刷新数据的逻辑
+            });
+            
+            // 文件操作按钮事件（查看、下载、删除等）
+            const viewButtons = document.querySelectorAll('.action-button:not(.danger):not([title="重新上传"])');
+            const deleteButtons = document.querySelectorAll('.action-button.danger');
+            const retryButtons = document.querySelectorAll('.action-button[title="重新上传"]');
+            
+            // 查看按钮事件
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    openModal('fileDetail');
+                });
+            });
+            
+            // 删除按钮事件
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    openModal('confirmDialog');
+                });
+            });
+            
+            // 重新上传按钮事件
+            retryButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // 模拟重新上传
+                    openModal('uploadProgress');
+                    simulateUploadProgress();
+                });
+            });
+            
+            // 确认删除按钮事件
+            document.getElementById('confirmAction').addEventListener('click', function() {
+                closeModal('confirmDialog');
+                showNotification('文件已删除');
+            });
+            
+            // 取消删除按钮事件
+            document.getElementById('cancelConfirm').addEventListener('click', function() {
+                closeModal('confirmDialog');
+            });
+            
+            // 关闭文件详情按钮事件
+            document.getElementById('closeDetailModal').addEventListener('click', function() {
+                closeModal('fileDetail');
+            });
+            
+            document.getElementById('closeDetailBtn').addEventListener('click', function() {
+                closeModal('fileDetail');
+            });
+            
+            // 下载文件按钮事件
+            document.getElementById('downloadFileBtn').addEventListener('click', function() {
+                showNotification('文件下载开始');
+            });
+            
+            // 分页控件事件
+            const paginationButtons = document.querySelectorAll('.pagination-button:not(:disabled)');
+            const paginationSelect = document.querySelector('.pagination-select');
+            
+            // 分页按钮点击事件
+            paginationButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // 移除所有活动状态
+                    document.querySelectorAll('.pagination-button.active').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    // 添加活动状态到当前按钮
+                    this.classList.add('active');
+                    
+                    // 这里可以添加切换分页的逻辑
+                    showNotification('已切换到第 ' + this.textContent + ' 页');
+                });
+            });
+            
+            // 每页显示条数变更事件
+            paginationSelect.addEventListener('change', function() {
+                showNotification('每页显示 ' + this.value + ' 条');
+                // 这里可以添加变更每页显示条数的逻辑
+            });
+            
+            // 显示通知提示
+            function showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                const notificationMessage = document.getElementById('notificationMessage');
+                
+                notificationMessage.textContent = message;
+                
+                // 根据通知类型设置不同的背景色
+                switch(type) {
+                    case 'success':
+                        notification.style.backgroundColor = '#10b981';
+                        notification.querySelector('i').className = 'fas fa-check-circle';
+                        break;
+                    case 'warning':
+                        notification.style.backgroundColor = '#f59e0b';
+                        notification.querySelector('i').className = 'fas fa-exclamation-circle';
+                        break;
+                    case 'error':
+                        notification.style.backgroundColor = '#e53e3e';
+                        notification.querySelector('i').className = 'fas fa-times-circle';
+                        break;
+                    case 'info':
+                        notification.style.backgroundColor = '#3182ce';
+                        notification.querySelector('i').className = 'fas fa-info-circle';
+                        break;
+                    default:
+                        notification.style.backgroundColor = '#10b981';
+                        notification.querySelector('i').className = 'fas fa-check-circle';
+                }
+                
+                // 显示通知
+                notification.style.display = 'block';
+                
+                // 3秒后自动隐藏
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            }
+            
+            // 项目和标段的联动
+            const projectSelect = document.querySelector('.form-select[required]:first-of-type');
+            const sectionSelect = document.querySelectorAll('.form-select[required]')[1];
+            
+            projectSelect.addEventListener('change', function() {
+                // 模拟项目和标段的联动
+                if (this.value) {
+                    sectionSelect.innerHTML = `
+                        <option value="">请选择标段</option>
+                        <option value="all">全标段</option>
+                        <option value="1">第1标段</option>
+                        <option value="2">第2标段</option>
+                        <option value="3">第3标段</option>
+                        <option value="4">第4标段</option>
+                        <option value="5">第5标段</option>
+                    `;
+                } else {
+                    sectionSelect.innerHTML = `
+                        <option value="">请选择标段</option>
+                    `;
+                }
+            });
+            
+            // 点击模态框背景关闭模态框
+            const allModals = document.querySelectorAll('.modal, .confirm-dialog');
+            allModals.forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        // 确定是点击了背景而不是内容
+                        const modalId = this.id.replace('Modal', '').replace('Dialog', '');
+                        closeModal(modalId);
+                    }
+                });
+            });
+            
+            // 按ESC键关闭模态框
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeAllModals();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

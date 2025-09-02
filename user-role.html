@@ -1,0 +1,2344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高速公路征地拆迁管理系统 - 用户角色管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 用户角色管理特定样式 */
+        .user-role-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 搜索和筛选区域 */
+        .search-filter-container {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .search-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .search-group {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .search-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+            min-width: 100px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .search-select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+        
+        .search-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .search-date {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .search-date:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .btn-filter {
+            padding: 8px 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-filter:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-reset {
+            padding: 8px 16px;
+            background-color: white;
+            color: var(--info);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-reset:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* 数据卡片区域 */
+        .data-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .data-card {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .data-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+        
+        .card-icon-primary {
+            background-color: var(--primary);
+        }
+        
+        .card-icon-info {
+            background-color: var(--info);
+        }
+        
+        .card-icon-success {
+            background-color: var(--success);
+        }
+        
+        .card-icon-warning {
+            background-color: var(--warning);
+        }
+        
+        .card-title {
+            font-size: 14px;
+            color: var(--info);
+            font-weight: 500;
+        }
+        
+        .card-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .card-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .card-change.positive {
+            color: var(--success);
+        }
+        
+        .card-change.negative {
+            color: var(--danger);
+        }
+        
+        .card-unit {
+            font-size: 12px;
+            color: var(--info);
+            margin-top: 4px;
+        }
+        
+        /* 表格区域 */
+        .table-container {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background-color: var(--bg-light);
+        }
+        
+        .table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-action-button {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .table-action-button:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .table-action-button.primary {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .table-action-button.primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background-color: var(--bg-light);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        
+        .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--dark);
+        }
+        
+        .data-table tr:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-primary {
+            background-color: rgba(22, 93, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        .badge-success {
+            background-color: rgba(0, 180, 42, 0.1);
+            color: var(--success);
+        }
+        
+        .badge-warning {
+            background-color: rgba(255, 125, 0, 0.1);
+            color: var(--warning);
+        }
+        
+        .badge-danger {
+            background-color: rgba(245, 63, 63, 0.1);
+            color: var(--danger);
+        }
+        
+        .table-actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-action {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .table-action:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .table-action.edit {
+            color: var(--primary);
+        }
+        
+        .table-action.delete {
+            color: var(--danger);
+        }
+        
+        .table-action.view {
+            color: var(--info);
+        }
+        
+        .table-action.role {
+            color: var(--success);
+        }
+        
+        /* 分页区域 */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            background-color: var(--bg-light);
+        }
+        
+        .pagination-info {
+            font-size: 14px;
+            color: var(--info);
+        }
+        
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .pagination-button {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .pagination-button:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .pagination-button.active {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-select {
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        /* 响应式样式 */
+        @media (max-width: 768px) {
+            .search-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .search-group {
+                width: 100%;
+            }
+            
+            .data-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .table-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .pagination-container {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .pagination-controls {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* 角色列表样式 */
+        .role-list {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+        }
+        
+        .role-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .role-list-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .role-list-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .role-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .role-card {
+            background-color: var(--bg-light);
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+        
+        .role-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(22, 93, 255, 0.1);
+        }
+        
+        .role-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .role-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .role-card-actions {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .role-card-action {
+            width: 24px;
+            height: 24px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .role-card-action:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .role-card-info {
+            margin-bottom: 12px;
+        }
+        
+        .role-card-detail {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+        
+        .role-card-label {
+            color: var(--info);
+        }
+        
+        .role-card-value {
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .role-card-permissions {
+            background-color: white;
+            border-radius: 4px;
+            padding: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        .role-card-permission-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+        
+        .role-card-permission-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .role-card-permission-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 8px;
+            margin-right: 6px;
+        }
+        
+        .role-card-permission-text {
+            color: var(--dark);
+        }
+        
+        /* 表单样式 */
+        .form-container {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+        }
+        
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .form-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-section {
+            margin-bottom: 20px;
+        }
+        
+        .form-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 12px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .form-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-input {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .form-select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .form-textarea {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .btn-primary {
+            padding: 8px 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            padding: 8px 16px;
+            background-color: white;
+            color: var(--info);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* 权限配置样式 */
+        .permission-config {
+            background-color: var(--bg-light);
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+        
+        .permission-category {
+            margin-bottom: 16px;
+        }
+        
+        .permission-category:last-child {
+            margin-bottom: 0;
+        }
+        
+        .permission-category-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .permission-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 8px;
+        }
+        
+        .permission-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+        
+        .permission-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        .permission-item label {
+            font-size: 14px;
+            color: var(--dark);
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 24px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background-color: transparent;
+            color: var(--info);
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+        
+        .modal-close:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+        
+        /* 确认对话框样式 */
+        .confirm-dialog {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .confirm-dialog.active {
+            display: flex;
+        }
+        
+        .confirm-dialog-content {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .confirm-dialog-header {
+            margin-bottom: 16px;
+        }
+        
+        .confirm-dialog-icon {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        
+        .confirm-dialog-icon i {
+            font-size: 48px;
+            color: var(--warning);
+        }
+        
+        .confirm-dialog-message {
+            text-align: center;
+            font-size: 16px;
+            color: var(--dark);
+            margin-bottom: 20px;
+        }
+        
+        .confirm-dialog-footer {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="user-role-container">
+        <!-- 侧边栏导航 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-road logo-icon"></i>
+                    <span class="logo-text">征拆管理系统</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <div class="menu-section-title">主导航</div>
+                
+                <a href="dashboard.html" class="menu-item">
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">仪表盘</span>
+                </a>
+                
+                <div class="menu-section-title">GIS数据管理</div>
+                
+                <a href="gis-data-upload.html" class="menu-item">
+                    <i class="fas fa-upload menu-icon"></i>
+                    <span class="menu-text">测绘数据上传</span>
+                </a>
+                
+                <a href="gis-publish.html" class="menu-item">
+                    <i class="fas fa-map-marked-alt menu-icon"></i>
+                    <span class="menu-text">GIS发布</span>
+                </a>
+                
+                <div class="menu-section-title">台账管理</div>
+                
+                <a href="gis-ledger.html" class="menu-item">
+                    <i class="fas fa-database menu-icon"></i>
+                    <span class="menu-text">GIS台账</span>
+                </a>
+                
+                <a href="land-ledger.html" class="menu-item">
+                    <i class="fas fa-paragraph menu-icon"></i>
+                    <span class="menu-text">征地台账</span>
+                </a>
+                
+                <a href="house-ledger.html" class="menu-item">
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">房屋台账</span>
+                </a>
+                
+                <a href="attachment-ledger.html" class="menu-item">
+                    <i class="fas fa-paperclip menu-icon"></i>
+                    <span class="menu-text">附着物台账</span>
+                </a>
+                
+                <a href="audit-ledger.html" class="menu-item">
+                    <i class="fas fa-search menu-icon"></i>
+                    <span class="menu-text">审核台账</span>
+                </a>
+                
+                <a href="agreement-ledger.html" class="menu-item">
+                    <i class="fas fa-file-contract menu-icon"></i>
+                    <span class="menu-text">协议台账</span>
+                </a>
+                
+                <a href="settlement-ledger.html" class="menu-item">
+                    <i class="fas fa-money-bill-wave menu-icon"></i>
+                    <span class="menu-text">结算台账</span>
+                </a>
+                
+                <div class="menu-section-title">基础配置管理</div>
+                
+                <a href="form-template.html" class="menu-item">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">表单协议模板管理</span>
+                </a>
+                
+                <a href="process-config.html" class="menu-item">
+                    <i class="fas fa-sitemap menu-icon"></i>
+                    <span class="menu-text">流程配置</span>
+                </a>
+                
+                <a href="compensation-standard.html" class="menu-item">
+                    <i class="fas fa-list-ol menu-icon"></i>
+                    <span class="menu-text">区域补偿标准库</span>
+                </a>
+                
+                <div class="menu-section-title">统计分析</div>
+                
+                <a href="demolition-stats.html" class="menu-item">
+                    <i class="fas fa-chart-bar menu-icon"></i>
+                    <span class="menu-text">征拆区域统计</span>
+                </a>
+                
+                <a href="project-stats.html" class="menu-item">
+                    <i class="fas fa-chart-line menu-icon"></i>
+                    <span class="menu-text">项目统计</span>
+                </a>
+                
+                <a href="group-stats.html" class="menu-item">
+                    <i class="fas fa-chart-pie menu-icon"></i>
+                    <span class="menu-text">集团统计</span>
+                </a>
+                
+                <div class="menu-section-title">系统管理</div>
+                
+                <a href="user-role.html" class="menu-item active">
+                    <i class="fas fa-users-cog menu-icon"></i>
+                    <span class="menu-text">用户角色管理</span>
+                </a>
+                
+                <a href="project-auth.html" class="menu-item">
+                    <i class="fas fa-key menu-icon"></i>
+                    <span class="menu-text">项目授权管理</span>
+                </a>
+                
+                <div class="menu-section-title">辅助支持</div>
+                
+                <a href="function-demo.html" class="menu-item">
+                    <i class="fas fa-play-circle menu-icon"></i>
+                    <span class="menu-text">功能演示入口</span>
+                </a>
+                
+                <a href="training-materials.html" class="menu-item">
+                    <i class="fas fa-book menu-icon"></i>
+                    <span class="menu-text">培训资料</span>
+                </a>
+                
+                <a href="operation-manual.html" class="menu-item">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">操作手册</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="main-content" id="mainContent">
+            <!-- 顶部导航栏 -->
+            <header class="top-nav" id="topNav">
+                <div class="nav-left">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="nav-title">用户角色管理</h1>
+                </div>
+                
+                <div class="nav-right">
+                    <div class="nav-item">
+                        <i class="fas fa-bell nav-icon"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-envelope nav-icon"></i>
+                        <span class="notification-badge">2</span>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-cog nav-icon"></i>
+                    </div>
+                    
+                    <div class="user-profile">
+                        <div class="avatar">张</div>
+                        <div class="user-info">
+                            <div class="user-name">张三</div>
+                            <div class="user-role">系统管理员</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- 页面内容 -->
+            <div class="page-content">
+                <div class="page-header">
+                    <h2 class="page-title">用户角色管理</h2>
+                    <div class="flex gap-3">
+                        <button class="btn btn-primary" id="batchDeleteBtn">
+                            <i class="fas fa-trash-alt"></i> 批量删除
+                        </button>
+                        <button class="btn btn-secondary" id="exportBtn">
+                            <i class="fas fa-file-export"></i> 导出
+                        </button>
+                        <button class="btn btn-secondary" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i> 刷新
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 数据概览卡片 -->
+                <div class="data-cards">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-primary">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="card-title">用户总数</div>
+                        </div>
+                        <div class="card-value">156</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长12个</span>
+                        </div>
+                        <div class="card-unit">人</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-success">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div class="card-title">活跃用户</div>
+                        </div>
+                        <div class="card-value">128</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长8个</span>
+                        </div>
+                        <div class="card-unit">人</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-info">
+                                <i class="fas fa-user-tag"></i>
+                            </div>
+                            <div class="card-title">角色总数</div>
+                        </div>
+                        <div class="card-value">8</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长1个</span>
+                        </div>
+                        <div class="card-unit">个</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-warning">
+                                <i class="fas fa-user-slash"></i>
+                            </div>
+                            <div class="card-title">禁用用户</div>
+                        </div>
+                        <div class="card-value">12</div>
+                        <div class="card-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>较上月减少2个</span>
+                        </div>
+                        <div class="card-unit">人</div>
+                    </div>
+                </div>
+                
+                <!-- 角色列表 -->
+                <div class="role-list">
+                    <div class="role-list-header">
+                        <div class="role-list-title">角色管理</div>
+                        <div class="role-list-actions">
+                            <button class="table-action-button primary" id="createRoleBtn">
+                                <i class="fas fa-plus"></i>
+                                新增角色
+                            </button>
+                            <button class="table-action-button" id="roleExportBtn">
+                                <i class="fas fa-file-export"></i>
+                                导出角色
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="role-cards">
+                        <div class="role-card">
+                            <div class="role-card-header">
+                                <div class="role-card-title">系统管理员</div>
+                                <div class="role-card-actions">
+                                    <button class="role-card-action" title="编辑">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="role-card-action" title="复制">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    <button class="role-card-action" title="删除" disabled>
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="role-card-info">
+                                <div class="role-card-detail">
+                                    <div class="role-card-label">用户数量</div>
+                                    <div class="role-card-value">3人</div>
+                                </div>
+                                <div class="role-card-detail">
+                                    <div class="role-card-label">创建时间</div>
+                                    <div class="role-card-value">2023-01-01</div>
+                                </div>
+                            </div>
+                            <div class="role-card-permissions">
+                                <div class="role-card-permission-item">
+                                    <div class="role-card-permission-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="role-card-permission-text">全部权限</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="role-card">
+                            <div class="role-card-header">
+                                <div class="role-card-title">项目经理</div>
+                                <div class="role-card-actions">
+                                    <button class="role-card-action" title="编辑">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="role-card-action" title="复制">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    <button class="role-card-action" title="删除">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="role-card-info">
+                                <div class="role-card-detail">
+                                    <div class="role-card-label">用户数量</div>
+                                    <div class="role-card-value">12人</div>
+                                </div>
+                                <div class="role-card-detail">
+                                    <div class="role-card-label">创建时间</div>
+                                    <div class="role-card-value">2023-01-05</div>
+                                </div>
+                            </div>
+                            <div class="role-card-permissions">
+                                <div class="role-card-permission-item">
+                                    <div class="role-card-permission-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="role-card-permission-text">项目管理</div>
+                                </div>
+                                <div class="role-card-permission-item">
+                                    <div class="role-card-permission-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="role-card-permission-text">数据查看</div>
+                                </div>
+                                <div class="role-card-permission-item">
+                                    <div class="role-card-permission-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="role-card-permission-text">审批管理</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="role-card">
+                            <div class="role-card-header">
+                                <div class="role-card-title">征拆专员</div>
+                                <div class="role-card-actions">
+                                    <button class="role-card-action" title="编辑">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="role-card-action" title="复制">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    <button class="role-card-action" title="删除">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="role-card-info">
+                                <div class="role-card-detail">
+                                    <div class="role-card-label">用户数量</div>
+                                    <div class="role-card-value">45人</div>
+                                </div>
+                                <div class="role-card-detail">
+                                    <div class="role-card-label">创建时间</div>
+                                    <div class="role-card-value">2023-01-08</div>
+                                </div>
+                            </div>
+                            <div class="role-card-permissions">
+                                <div class="role-card-permission-item">
+                                    <div class="role-card-permission-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="role-card-permission-text">数据录入</div>
+                                </div>
+                                <div class="role-card-permission-item">
+                                    <div class="role-card-permission-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="role-card-permission-text">数据查看</div>
+                                </div>
+                                <div class="role-card-permission-item">
+                                    <div class="role-card-permission-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="role-card-permission-text">GIS数据管理</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="role-card">
+                            <div class="role-card-header">
+                                <div class="role-card-title">财务专员</div>
+                                <div class="role-card-actions">
+                                    <button class="role-card-action" title="编辑">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="role-card-action" title="复制">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    <button class="role-card-action" title="删除">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="role-card-info">
+                                <div class="role-card-detail">
+                                    <div class="role-card-label">用户数量</div>
+                                    <div class="role-card-value">8人</div>
+                                </div>
+                                <div class="role-card-detail">
+                                    <div class="role-card-label">创建时间</div>
+                                    <div class="role-card-value">2023-01-10</div>
+                                </div>
+                            </div>
+                            <div class="role-card-permissions">
+                                <div class="role-card-permission-item">
+                                    <div class="role-card-permission-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="role-card-permission-text">结算管理</div>
+                                </div>
+                                <div class="role-card-permission-item">
+                                    <div class="role-card-permission-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="role-card-permission-text">协议管理</div>
+                                </div>
+                                <div class="role-card-permission-item">
+                                    <div class="role-card-permission-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    <div class="role-card-permission-text">数据查看</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 搜索和筛选区域 -->
+                <div class="search-filter-container">
+                    <div class="search-row">
+                        <div class="search-group">
+                            <label for="userName">用户名</label>
+                            <input type="text" id="userName" class="search-input" placeholder="请输入用户名">
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="realName">真实姓名</label>
+                            <input type="text" id="realName" class="search-input" placeholder="请输入真实姓名">
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="userRole">用户角色</label>
+                            <select id="userRole" class="search-select">
+                                <option value="">全部角色</option>
+                                <option value="admin">系统管理员</option>
+                                <option value="projectManager">项目经理</option>
+                                <option value="demolitionOfficer">征拆专员</option>
+                                <option value="financialOfficer">财务专员</option>
+                                <option value="auditor">审核员</option>
+                                <option value="viewer">查看员</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="search-row">
+                        <div class="search-group">
+                            <label for="department">所属部门</label>
+                            <select id="department" class="search-select">
+                                <option value="">全部部门</option>
+                                <option value="adminDept">行政部</option>
+                                <option value="projectDept">项目部</option>
+                                <option value="demolitionDept">征拆部</option>
+                                <option value="financeDept">财务部</option>
+                                <option value="auditDept">审计部</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="userStatus">用户状态</label>
+                            <select id="userStatus" class="search-select">
+                                <option value="">全部状态</option>
+                                <option value="active">活跃</option>
+                                <option value="disabled">禁用</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="createTime">创建时间</label>
+                            <input type="date" id="createTime" class="search-date">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button class="btn-reset" id="resetFilter">
+                            <i class="fas fa-redo-alt"></i> 重置
+                        </button>
+                        <button class="btn-filter" id="applyFilter">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 用户列表表格 -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">用户管理</div>
+                        <div class="table-actions">
+                            <button class="table-action-button primary" id="createUserBtn">
+                                <i class="fas fa-plus"></i>
+                                新增用户
+                            </button>
+                            <button class="table-action-button" id="importUserBtn">
+                                <i class="fas fa-file-import"></i>
+                                导入用户
+                            </button>
+                            <button class="table-action-button" id="exportUserBtn">
+                                <i class="fas fa-file-export"></i>
+                                导出用户
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="selectAll"></th>
+                                    <th>序号</th>
+                                    <th>用户名</th>
+                                    <th>真实姓名</th>
+                                    <th>所属部门</th>
+                                    <th>用户角色</th>
+                                    <th>状态</th>
+                                    <th>创建时间</th>
+                                    <th>最后登录</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox" class="select-item"></td>
+                                    <td>1</td>
+                                    <td>admin</td>
+                                    <td>张三</td>
+                                    <td>行政部</td>
+                                    <td>系统管理员</td>
+                                    <td><span class="table-badge badge-success">活跃</span></td>
+                                    <td>2023-01-01</td>
+                                    <td>2023-12-31 10:30:45</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action role" title="角色">
+                                            <i class="fas fa-user-tag"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除" disabled>
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><input type="checkbox" class="select-item"></td>
+                                    <td>2</td>
+                                    <td>project01</td>
+                                    <td>李四</td>
+                                    <td>项目部</td>
+                                    <td>项目经理</td>
+                                    <td><span class="table-badge badge-success">活跃</span></td>
+                                    <td>2023-01-05</td>
+                                    <td>2023-12-30 15:20:33</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action role" title="角色">
+                                            <i class="fas fa-user-tag"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><input type="checkbox" class="select-item"></td>
+                                    <td>3</td>
+                                    <td>demo001</td>
+                                    <td>王五</td>
+                                    <td>征拆部</td>
+                                    <td>征拆专员</td>
+                                    <td><span class="table-badge badge-success">活跃</span></td>
+                                    <td>2023-01-08</td>
+                                    <td>2023-12-31 09:15:22</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action role" title="角色">
+                                            <i class="fas fa-user-tag"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><input type="checkbox" class="select-item"></td>
+                                    <td>4</td>
+                                    <td>finance01</td>
+                                    <td>赵六</td>
+                                    <td>财务部</td>
+                                    <td>财务专员</td>
+                                    <td><span class="table-badge badge-success">活跃</span></td>
+                                    <td>2023-01-10</td>
+                                    <td>2023-12-30 16:42:18</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action role" title="角色">
+                                            <i class="fas fa-user-tag"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><input type="checkbox" class="select-item"></td>
+                                    <td>5</td>
+                                    <td>audit001</td>
+                                    <td>孙七</td>
+                                    <td>审计部</td>
+                                    <td>审核员</td>
+                                    <td><span class="table-badge badge-success">活跃</span></td>
+                                    <td>2023-01-15</td>
+                                    <td>2023-12-31 11:28:47</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action role" title="角色">
+                                            <i class="fas fa-user-tag"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><input type="checkbox" class="select-item"></td>
+                                    <td>6</td>
+                                    <td>viewer001</td>
+                                    <td>周八</td>
+                                    <td>管理层</td>
+                                    <td>查看员</td>
+                                    <td><span class="table-badge badge-success">活跃</span></td>
+                                    <td>2023-01-20</td>
+                                    <td>2023-12-29 14:10:23</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action role" title="角色">
+                                            <i class="fas fa-user-tag"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td><input type="checkbox" class="select-item"></td>
+                                    <td>7</td>
+                                    <td>test001</td>
+                                    <td>吴九</td>
+                                    <td>测试部</td>
+                                    <td>征拆专员</td>
+                                    <td><span class="table-badge badge-warning">禁用</span></td>
+                                    <td>2023-02-01</td>
+                                    <td>2023-06-15 09:30:12</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action role" title="角色">
+                                            <i class="fas fa-user-tag"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 分页控件 -->
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            显示 1 到 7，共 156 条记录
+                        </div>
+                        
+                        <div class="pagination-controls">
+                            <button class="pagination-button" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="pagination-button active">1</button>
+                            <button class="pagination-button">2</button>
+                            <button class="pagination-button">3</button>
+                            <button class="pagination-button">4</button>
+                            <button class="pagination-button">5</button>
+                            <button class="pagination-button">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <select class="pagination-select">
+                                <option value="10">10条/页</option>
+                                <option value="20">20条/页</option>
+                                <option value="50">50条/页</option>
+                                <option value="100">100条/页</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 新增/编辑角色模态框 -->
+    <div class="modal" id="roleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">新增角色</div>
+                <button class="modal-close" id="closeRoleModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="roleName">角色名称</label>
+                    <input type="text" id="roleName" class="form-input" placeholder="请输入角色名称">
+                </div>
+                
+                <div class="form-group">
+                    <label for="roleDescription">角色描述</label>
+                    <textarea id="roleDescription" class="form-textarea" placeholder="请输入角色描述"></textarea>
+                </div>
+                
+                <div class="permission-config">
+                    <div class="permission-category">
+                        <div class="permission-category-title">系统管理</div>
+                        <div class="permission-items">
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-system-admin">
+                                <label for="perm-system-admin">用户管理</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-role-admin">
+                                <label for="perm-role-admin">角色管理</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-auth-admin">
+                                <label for="perm-auth-admin">权限管理</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="permission-category">
+                        <div class="permission-category-title">项目管理</div>
+                        <div class="permission-items">
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-project-view">
+                                <label for="perm-project-view">项目查看</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-project-edit">
+                                <label for="perm-project-edit">项目编辑</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-project-create">
+                                <label for="perm-project-create">项目创建</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-project-delete">
+                                <label for="perm-project-delete">项目删除</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="permission-category">
+                        <div class="permission-category-title">数据管理</div>
+                        <div class="permission-items">
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-data-view">
+                                <label for="perm-data-view">数据查看</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-data-edit">
+                                <label for="perm-data-edit">数据编辑</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-data-import">
+                                <label for="perm-data-import">数据导入</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-data-export">
+                                <label for="perm-data-export">数据导出</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-data-delete">
+                                <label for="perm-data-delete">数据删除</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="permission-category">
+                        <div class="permission-category-title">GIS数据管理</div>
+                        <div class="permission-items">
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-gis-upload">
+                                <label for="perm-gis-upload">GIS数据上传</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-gis-publish">
+                                <label for="perm-gis-publish">GIS发布</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-gis-view">
+                                <label for="perm-gis-view">GIS数据查看</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="permission-category">
+                        <div class="permission-category-title">审批管理</div>
+                        <div class="permission-items">
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-audit-create">
+                                <label for="perm-audit-create">发起审批</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-audit-process">
+                                <label for="perm-audit-process">处理审批</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-audit-view">
+                                <label for="perm-audit-view">查看审批</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="permission-category">
+                        <div class="permission-category-title">统计分析</div>
+                        <div class="permission-items">
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-stats-view">
+                                <label for="perm-stats-view">查看统计</label>
+                            </div>
+                            <div class="permission-item">
+                                <input type="checkbox" id="perm-stats-export">
+                                <label for="perm-stats-export">导出统计</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelRoleBtn">取消</button>
+                <button class="btn-primary" id="saveRoleBtn">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 新增/编辑用户模态框 -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">新增用户</div>
+                <button class="modal-close" id="closeUserModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="userNameInput">用户名 *</label>
+                        <input type="text" id="userNameInput" class="form-input" placeholder="请输入用户名" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="realNameInput">真实姓名 *</label>
+                        <input type="text" id="realNameInput" class="form-input" placeholder="请输入真实姓名" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="passwordInput">密码</label>
+                        <input type="password" id="passwordInput" class="form-input" placeholder="请输入密码">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmPasswordInput">确认密码</label>
+                        <input type="password" id="confirmPasswordInput" class="form-input" placeholder="请确认密码">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="departmentInput">所属部门 *</label>
+                        <select id="departmentInput" class="form-select" required>
+                            <option value="">请选择部门</option>
+                            <option value="adminDept">行政部</option>
+                            <option value="projectDept">项目部</option>
+                            <option value="demolitionDept">征拆部</option>
+                            <option value="financeDept">财务部</option>
+                            <option value="auditDept">审计部</option>
+                            <option value="managementDept">管理层</option>
+                            <option value="testDept">测试部</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userRoleInput">用户角色 *</label>
+                        <select id="userRoleInput" class="form-select" required>
+                            <option value="">请选择角色</option>
+                            <option value="admin">系统管理员</option>
+                            <option value="projectManager">项目经理</option>
+                            <option value="demolitionOfficer">征拆专员</option>
+                            <option value="financialOfficer">财务专员</option>
+                            <option value="auditor">审核员</option>
+                            <option value="viewer">查看员</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="emailInput">邮箱</label>
+                        <input type="email" id="emailInput" class="form-input" placeholder="请输入邮箱">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phoneInput">手机号码 *</label>
+                        <input type="tel" id="phoneInput" class="form-input" placeholder="请输入手机号码" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="userStatusInput">用户状态 *</label>
+                        <select id="userStatusInput" class="form-select" required>
+                            <option value="active">活跃</option>
+                            <option value="disabled">禁用</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="userDescriptionInput">备注</label>
+                        <input type="text" id="userDescriptionInput" class="form-input" placeholder="请输入备注信息">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelUserBtn">取消</button>
+                <button class="btn-primary" id="saveUserBtn">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 确认对话框 -->
+    <div class="confirm-dialog" id="confirmDialog">
+        <div class="confirm-dialog-content">
+            <div class="confirm-dialog-header">
+                <div class="confirm-dialog-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+            </div>
+            
+            <div class="confirm-dialog-message">
+                确定要删除选中的项目吗？此操作不可撤销。
+            </div>
+            
+            <div class="confirm-dialog-footer">
+                <button class="btn-secondary" id="cancelConfirmBtn">取消</button>
+                <button class="btn-primary" id="confirmBtn">确定</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 侧边栏切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 侧边栏切换
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            
+            function toggleSidebar() {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+                sidebarToggle.querySelector('i').classList.toggle('fa-chevron-left');
+                sidebarToggle.querySelector('i').classList.toggle('fa-chevron-right');
+            }
+            
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            mobileMenuToggle.addEventListener('click', toggleSidebar);
+            
+            // 角色模态框控制
+            const roleModal = document.getElementById('roleModal');
+            const createRoleBtn = document.getElementById('createRoleBtn');
+            const closeRoleModal = document.getElementById('closeRoleModal');
+            const cancelRoleBtn = document.getElementById('cancelRoleBtn');
+            const saveRoleBtn = document.getElementById('saveRoleBtn');
+            
+            function openRoleModal() {
+                roleModal.classList.add('active');
+                // 重置表单
+                document.getElementById('roleName').value = '';
+                document.getElementById('roleDescription').value = '';
+                
+                // 重置所有权限复选框
+                const checkboxes = document.querySelectorAll('.permission-item input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+            
+            function closeRoleModalFunc() {
+                roleModal.classList.remove('active');
+            }
+            
+            createRoleBtn.addEventListener('click', openRoleModal);
+            closeRoleModal.addEventListener('click', closeRoleModalFunc);
+            cancelRoleBtn.addEventListener('click', closeRoleModalFunc);
+            
+            saveRoleBtn.addEventListener('click', function() {
+                const roleName = document.getElementById('roleName').value;
+                if (!roleName) {
+                    alert('请输入角色名称');
+                    return;
+                }
+                
+                // 收集选中的权限
+                const selectedPermissions = [];
+                const checkboxes = document.querySelectorAll('.permission-item input[type="checkbox"]:checked');
+                checkboxes.forEach(checkbox => {
+                    selectedPermissions.push(checkbox.id.replace('perm-', ''));
+                });
+                
+                console.log('保存角色:', {
+                    name: roleName,
+                    description: document.getElementById('roleDescription').value,
+                    permissions: selectedPermissions
+                });
+                
+                // 模拟保存成功
+                alert('角色保存成功！');
+                closeRoleModalFunc();
+            });
+            
+            // 用户模态框控制
+            const userModal = document.getElementById('userModal');
+            const createUserBtn = document.getElementById('createUserBtn');
+            const closeUserModal = document.getElementById('closeUserModal');
+            const cancelUserBtn = document.getElementById('cancelUserBtn');
+            const saveUserBtn = document.getElementById('saveUserBtn');
+            
+            function openUserModal() {
+                userModal.classList.add('active');
+                // 重置表单
+                document.getElementById('userNameInput').value = '';
+                document.getElementById('realNameInput').value = '';
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('confirmPasswordInput').value = '';
+                document.getElementById('departmentInput').value = '';
+                document.getElementById('userRoleInput').value = '';
+                document.getElementById('emailInput').value = '';
+                document.getElementById('phoneInput').value = '';
+                document.getElementById('userStatusInput').value = 'active';
+                document.getElementById('userDescriptionInput').value = '';
+            }
+            
+            function closeUserModalFunc() {
+                userModal.classList.remove('active');
+            }
+            
+            createUserBtn.addEventListener('click', openUserModal);
+            closeUserModal.addEventListener('click', closeUserModalFunc);
+            cancelUserBtn.addEventListener('click', closeUserModalFunc);
+            
+            saveUserBtn.addEventListener('click', function() {
+                // 表单验证
+                const userName = document.getElementById('userNameInput').value;
+                const realName = document.getElementById('realNameInput').value;
+                const department = document.getElementById('departmentInput').value;
+                const userRole = document.getElementById('userRoleInput').value;
+                const phone = document.getElementById('phoneInput').value;
+                
+                if (!userName || !realName || !department || !userRole || !phone) {
+                    alert('请填写所有必填字段');
+                    return;
+                }
+                
+                const password = document.getElementById('passwordInput').value;
+                const confirmPassword = document.getElementById('confirmPasswordInput').value;
+                
+                if (password && password !== confirmPassword) {
+                    alert('两次输入的密码不一致');
+                    return;
+                }
+                
+                console.log('保存用户:', {
+                    userName,
+                    realName,
+                    department,
+                    userRole,
+                    phone,
+                    email: document.getElementById('emailInput').value,
+                    status: document.getElementById('userStatusInput').value,
+                    description: document.getElementById('userDescriptionInput').value
+                });
+                
+                // 模拟保存成功
+                alert('用户保存成功！');
+                closeUserModalFunc();
+            });
+            
+            // 确认对话框控制
+            const confirmDialog = document.getElementById('confirmDialog');
+            const confirmBtn = document.getElementById('confirmBtn');
+            const cancelConfirmBtn = document.getElementById('cancelConfirmBtn');
+            const batchDeleteBtn = document.getElementById('batchDeleteBtn');
+            
+            let confirmAction = null;
+            
+            function openConfirmDialog(message, action) {
+                confirmDialog.querySelector('.confirm-dialog-message').textContent = message;
+                confirmDialog.classList.add('active');
+                confirmAction = action;
+            }
+            
+            function closeConfirmDialog() {
+                confirmDialog.classList.remove('active');
+                confirmAction = null;
+            }
+            
+            confirmBtn.addEventListener('click', function() {
+                if (typeof confirmAction === 'function') {
+                    confirmAction();
+                }
+                closeConfirmDialog();
+            });
+            
+            cancelConfirmBtn.addEventListener('click', closeConfirmDialog);
+            
+            // 批量删除功能
+            batchDeleteBtn.addEventListener('click', function() {
+                const selectedItems = document.querySelectorAll('.select-item:checked');
+                if (selectedItems.length === 0) {
+                    alert('请先选择要删除的用户');
+                    return;
+                }
+                
+                openConfirmDialog(`确定要删除选中的 ${selectedItems.length} 个用户吗？此操作不可撤销。`, function() {
+                    console.log('执行批量删除');
+                    // 模拟删除成功
+                    alert(`成功删除 ${selectedItems.length} 个用户！`);
+                    // 刷新页面或更新表格
+                });
+            });
+            
+            // 全选/取消全选
+            const selectAll = document.getElementById('selectAll');
+            const selectItems = document.querySelectorAll('.select-item');
+            
+            selectAll.addEventListener('change', function() {
+                selectItems.forEach(item => {
+                    item.checked = selectAll.checked;
+                });
+            });
+            
+            // 刷新功能
+            const refreshBtn = document.getElementById('refreshBtn');
+            refreshBtn.addEventListener('click', function() {
+                console.log('刷新页面数据');
+                // 模拟刷新
+                alert('数据已刷新！');
+            });
+            
+            // 导出功能
+            const exportBtn = document.getElementById('exportBtn');
+            const roleExportBtn = document.getElementById('roleExportBtn');
+            const exportUserBtn = document.getElementById('exportUserBtn');
+            
+            exportBtn.addEventListener('click', function() {
+                console.log('导出所有数据');
+                alert('数据导出成功！');
+            });
+            
+            roleExportBtn.addEventListener('click', function() {
+                console.log('导出角色数据');
+                alert('角色数据导出成功！');
+            });
+            
+            exportUserBtn.addEventListener('click', function() {
+                console.log('导出用户数据');
+                alert('用户数据导出成功！');
+            });
+            
+            // 搜索和筛选功能
+            const applyFilter = document.getElementById('applyFilter');
+            const resetFilter = document.getElementById('resetFilter');
+            
+            applyFilter.addEventListener('click', function() {
+                const filters = {
+                    userName: document.getElementById('userName').value,
+                    realName: document.getElementById('realName').value,
+                    userRole: document.getElementById('userRole').value,
+                    department: document.getElementById('department').value,
+                    userStatus: document.getElementById('userStatus').value,
+                    createTime: document.getElementById('createTime').value
+                };
+                
+                console.log('应用筛选条件:', filters);
+                alert('筛选条件已应用！');
+            });
+            
+            resetFilter.addEventListener('click', function() {
+                document.getElementById('userName').value = '';
+                document.getElementById('realName').value = '';
+                document.getElementById('userRole').value = '';
+                document.getElementById('department').value = '';
+                document.getElementById('userStatus').value = '';
+                document.getElementById('createTime').value = '';
+                
+                console.log('重置筛选条件');
+            });
+            
+            // 导入用户功能
+            const importUserBtn = document.getElementById('importUserBtn');
+            importUserBtn.addEventListener('click', function() {
+                console.log('导入用户数据');
+                alert('请选择要导入的用户数据文件');
+                // 这里可以添加文件选择对话框
+            });
+            
+            // 角色卡片编辑功能
+            const roleEditButtons = document.querySelectorAll('.role-card-action.edit');
+            roleEditButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const roleCard = this.closest('.role-card');
+                    const roleName = roleCard.querySelector('.role-card-title').textContent;
+                    
+                    // 打开编辑模态框
+                    document.querySelector('#roleModal .modal-title').textContent = '编辑角色';
+                    document.getElementById('roleName').value = roleName;
+                    roleModal.classList.add('active');
+                });
+            });
+            
+            // 角色卡片删除功能
+            const roleDeleteButtons = document.querySelectorAll('.role-card-action.delete:not(:disabled)');
+            roleDeleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const roleCard = this.closest('.role-card');
+                    const roleName = roleCard.querySelector('.role-card-title').textContent;
+                    
+                    openConfirmDialog(`确定要删除角色 "${roleName}" 吗？此操作不可撤销。`, function() {
+                        console.log('删除角色:', roleName);
+                        // 模拟删除成功
+                        alert(`角色 "${roleName}" 删除成功！`);
+                        // 刷新页面或更新角色列表
+                    });
+                });
+            });
+            
+            // 用户表格编辑功能
+            const userEditButtons = document.querySelectorAll('.table-action.edit');
+            userEditButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const userName = row.querySelector('td:nth-child(3)').textContent;
+                    const realName = row.querySelector('td:nth-child(4)').textContent;
+                    
+                    // 打开编辑模态框
+                    document.querySelector('#userModal .modal-title').textContent = '编辑用户';
+                    document.getElementById('userNameInput').value = userName;
+                    document.getElementById('realNameInput').value = realName;
+                    // 这里可以根据实际数据填充其他字段
+                    userModal.classList.add('active');
+                });
+            });
+            
+            // 用户表格删除功能
+            const userDeleteButtons = document.querySelectorAll('.table-action.delete:not(:disabled)');
+            userDeleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const userName = row.querySelector('td:nth-child(3)').textContent;
+                    const realName = row.querySelector('td:nth-child(4)').textContent;
+                    
+                    openConfirmDialog(`确定要删除用户 "${realName}(${userName})" 吗？此操作不可撤销。`, function() {
+                        console.log('删除用户:', userName);
+                        // 模拟删除成功
+                        alert(`用户 "${realName}(${userName})" 删除成功！`);
+                        // 刷新页面或更新用户列表
+                    });
+                });
+            });
+            
+            // 用户表格查看功能
+            const userViewButtons = document.querySelectorAll('.table-action.view');
+            userViewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const userName = row.querySelector('td:nth-child(3)').textContent;
+                    const realName = row.querySelector('td:nth-child(4)').textContent;
+                    
+                    console.log('查看用户详情:', userName);
+                    // 这里可以打开用户详情模态框
+                    alert(`查看用户 "${realName}(${userName})" 的详细信息`);
+                });
+            });
+            
+            // 用户表格角色设置功能
+            const userRoleButtons = document.querySelectorAll('.table-action.role');
+            userRoleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const userName = row.querySelector('td:nth-child(3)').textContent;
+                    const realName = row.querySelector('td:nth-child(4)').textContent;
+                    
+                    console.log('设置用户角色:', userName);
+                    // 这里可以打开角色设置模态框
+                    alert(`设置用户 "${realName}(${userName})" 的角色信息`);
+                });
+            });
+            
+            // 分页功能
+            const paginationButtons = document.querySelectorAll('.pagination-button:not(:disabled):not(:has(i))');
+            paginationButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // 移除所有按钮的active类
+                    paginationButtons.forEach(btn => btn.classList.remove('active'));
+                    // 为当前点击的按钮添加active类
+                    this.classList.add('active');
+                    
+                    console.log('切换到页码:', this.textContent);
+                    // 这里可以添加切换页码的逻辑
+                });
+            });
+            
+            // 每页显示条数改变
+            const paginationSelect = document.querySelector('.pagination-select');
+            paginationSelect.addEventListener('change', function() {
+                console.log('每页显示条数改变为:', this.value);
+                // 这里可以添加改变每页显示条数的逻辑
+            });
+        });
+    </script>
+</body>
+</html>

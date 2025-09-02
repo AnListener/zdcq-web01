@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高速公路征地拆迁管理系统 - 表单协议模板管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 表单协议模板管理特定样式 */
+        .form-template-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 搜索和筛选区域 */
+        .search-filter-container {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .search-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .search-group {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .search-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+            min-width: 100px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .search-select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+        
+        .search-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .btn-filter {
+            padding: 8px 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-filter:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-reset {
+            padding: 8px 16px;
+            background-color: white;
+            color: var(--info);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-reset:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* 数据卡片区域 */
+        .data-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .data-card {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .data-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+        
+        .card-icon-primary {
+            background-color: var(--primary);
+        }
+        
+        .card-icon-info {
+            background-color: var(--info);
+        }
+        
+        .card-icon-success {
+            background-color: var(--success);
+        }
+        
+        .card-icon-warning {
+            background-color: var(--warning);
+        }
+        
+        .card-icon-danger {
+            background-color: var(--danger);
+        }
+        
+        .card-title {
+            font-size: 14px;
+            color: var(--info);
+            font-weight: 500;
+        }
+        
+        .card-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .card-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .card-change.positive {
+            color: var(--success);
+        }
+        
+        .card-change.negative {
+            color: var(--danger);
+        }
+        
+        /* 表格区域 */
+        .table-container {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background-color: var(--bg-light);
+        }
+        
+        .table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-action-button {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .table-action-button:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background-color: var(--bg-light);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        
+        .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--dark);
+        }
+        
+        .data-table tr:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        .table-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-primary {
+            background-color: rgba(22, 93, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        .badge-success {
+            background-color: rgba(0, 180, 42, 0.1);
+            color: var(--success);
+        }
+        
+        .badge-warning {
+            background-color: rgba(255, 125, 0, 0.1);
+            color: var(--warning);
+        }
+        
+        .badge-danger {
+            background-color: rgba(245, 63, 63, 0.1);
+            color: var(--danger);
+        }
+        
+        .badge-info {
+            background-color: rgba(0, 151, 255, 0.1);
+            color: var(--info);
+        }
+        
+        .table-actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-action {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .table-action:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .table-action.view {
+            color: var(--primary);
+        }
+        
+        .table-action.edit {
+            color: var(--warning);
+        }
+        
+        .table-action.delete {
+            color: var(--danger);
+        }
+        
+        .table-action.clone {
+            color: var(--info);
+        }
+        
+        .table-action.preview {
+            color: var(--success);
+        }
+        
+        /* 分页区域 */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            background-color: var(--bg-light);
+        }
+        
+        .pagination-info {
+            font-size: 14px;
+            color: var(--info);
+        }
+        
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .pagination-button {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .pagination-button:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .pagination-button.active {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-select {
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        /* 响应式样式 */
+        @media (max-width: 768px) {
+            .search-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .search-group {
+                width: 100%;
+            }
+            
+            .data-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .table-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .pagination-container {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .pagination-controls {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* 特殊样式：模板预览 */
+        .template-preview {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .preview-actions {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .preview-action {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            background-color: var(--bg-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--info);
+            cursor: pointer;
+        }
+        
+        .preview-action:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="form-template-container">
+        <!-- 侧边栏导航 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-road logo-icon"></i>
+                    <span class="logo-text">征拆管理系统</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <div class="menu-section-title">主导航</div>
+                
+                <a href="dashboard.html" class="menu-item">
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">仪表盘</span>
+                </a>
+                
+                <div class="menu-section-title">GIS数据管理</div>
+                
+                <a href="gis-data-upload.html" class="menu-item">
+                    <i class="fas fa-upload menu-icon"></i>
+                    <span class="menu-text">测绘数据上传</span>
+                </a>
+                
+                <a href="gis-publish.html" class="menu-item">
+                    <i class="fas fa-map-marked-alt menu-icon"></i>
+                    <span class="menu-text">GIS发布</span>
+                </a>
+                
+                <div class="menu-section-title">台账管理</div>
+                
+                <a href="gis-ledger.html" class="menu-item">
+                    <i class="fas fa-database menu-icon"></i>
+                    <span class="menu-text">GIS台账</span>
+                </a>
+                
+                <a href="land-ledger.html" class="menu-item">
+                    <i class="fas fa-paragraph menu-icon"></i>
+                    <span class="menu-text">征地台账</span>
+                </a>
+                
+                <a href="house-ledger.html" class="menu-item">
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">房屋台账</span>
+                </a>
+                
+                <a href="attachment-ledger.html" class="menu-item">
+                    <i class="fas fa-paperclip menu-icon"></i>
+                    <span class="menu-text">附着物台账</span>
+                </a>
+                
+                <a href="audit-ledger.html" class="menu-item">
+                    <i class="fas fa-search menu-icon"></i>
+                    <span class="menu-text">审核台账</span>
+                </a>
+                
+                <a href="agreement-ledger.html" class="menu-item">
+                    <i class="fas fa-file-contract menu-icon"></i>
+                    <span class="menu-text">协议台账</span>
+                </a>
+                
+                <a href="settlement-ledger.html" class="menu-item">
+                    <i class="fas fa-money-bill-wave menu-icon"></i>
+                    <span class="menu-text">结算台账</span>
+                </a>
+                
+                <div class="menu-section-title">基础配置管理</div>
+                
+                <a href="form-template.html" class="menu-item active">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">表单协议模板管理</span>
+                    <span class="menu-badge">3</span>
+                </a>
+                
+                <a href="process-config.html" class="menu-item">
+                    <i class="fas fa-sitemap menu-icon"></i>
+                    <span class="menu-text">流程配置</span>
+                </a>
+                
+                <a href="compensation-standard.html" class="menu-item">
+                    <i class="fas fa-list-ol menu-icon"></i>
+                    <span class="menu-text">区域补偿标准库</span>
+                </a>
+                
+                <div class="menu-section-title">统计分析</div>
+                
+                <a href="demolition-stats.html" class="menu-item">
+                    <i class="fas fa-chart-bar menu-icon"></i>
+                    <span class="menu-text">征拆区域统计</span>
+                </a>
+                
+                <a href="project-stats.html" class="menu-item">
+                    <i class="fas fa-chart-line menu-icon"></i>
+                    <span class="menu-text">项目统计</span>
+                </a>
+                
+                <a href="group-stats.html" class="menu-item">
+                    <i class="fas fa-chart-pie menu-icon"></i>
+                    <span class="menu-text">集团统计</span>
+                </a>
+                
+                <div class="menu-section-title">系统管理</div>
+                
+                <a href="user-role.html" class="menu-item">
+                    <i class="fas fa-users-cog menu-icon"></i>
+                    <span class="menu-text">用户角色管理</span>
+                </a>
+                
+                <a href="project-auth.html" class="menu-item">
+                    <i class="fas fa-key menu-icon"></i>
+                    <span class="menu-text">项目授权管理</span>
+                </a>
+                
+                <div class="menu-section-title">辅助支持</div>
+                
+                <a href="function-demo.html" class="menu-item">
+                    <i class="fas fa-play-circle menu-icon"></i>
+                    <span class="menu-text">功能演示入口</span>
+                </a>
+                
+                <a href="training-materials.html" class="menu-item">
+                    <i class="fas fa-book menu-icon"></i>
+                    <span class="menu-text">培训资料</span>
+                </a>
+                
+                <a href="operation-manual.html" class="menu-item">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">操作手册</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="main-content" id="mainContent">
+            <!-- 顶部导航栏 -->
+            <header class="top-nav" id="topNav">
+                <div class="nav-left">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="nav-title">表单协议模板管理</h1>
+                </div>
+                
+                <div class="nav-right">
+                    <div class="nav-item">
+                        <i class="fas fa-bell nav-icon"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-envelope nav-icon"></i>
+                        <span class="notification-badge">2</span>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-cog nav-icon"></i>
+                    </div>
+                    
+                    <div class="user-profile">
+                        <div class="avatar">张</div>
+                        <div class="user-info">
+                            <div class="user-name">张三</div>
+                            <div class="user-role">系统管理员</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- 页面内容 -->
+            <div class="page-content">
+                <div class="page-header">
+                    <h2 class="page-title">表单协议模板管理</h2>
+                    <div class="flex gap-3">
+                        <button class="btn btn-primary" id="addTemplateBtn">
+                            <i class="fas fa-plus"></i> 新增模板
+                        </button>
+                        <button class="btn btn-secondary" id="importTemplateBtn">
+                            <i class="fas fa-file-import"></i> 导入模板
+                        </button>
+                        <button class="btn btn-secondary" id="exportBtn">
+                            <i class="fas fa-file-export"></i> 导出
+                        </button>
+                        <button class="btn btn-secondary" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i> 刷新
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 搜索和筛选区域 -->
+                <div class="search-filter-container">
+                    <div class="search-row">
+                        <div class="search-group">
+                            <label for="templateName">模板名称</label>
+                            <input type="text" id="templateName" class="search-input" placeholder="输入模板名称">
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="templateType">模板类型</label>
+                            <select id="templateType" class="search-select">
+                                <option value="">全部类型</option>
+                                <option value="agreement">协议模板</option>
+                                <option value="form">表单模板</option>
+                                <option value="report">报表模板</option>
+                                <option value="document">文档模板</option>
+                                <option value="other">其他模板</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="templateCategory">模板分类</label>
+                            <select id="templateCategory" class="search-select">
+                                <option value="">全部分类</option>
+                                <option value="land">征地类</option>
+                                <option value="house">房屋拆迁类</option>
+                                <option value="attachment">附着物补偿类</option>
+                                <option value="audit">审核类</option>
+                                <option value="agreement">协议类</option>
+                                <option value="settlement">结算类</option>
+                                <option value="other">其他类</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="search-row">
+                        <div class="search-group">
+                            <label for="templateStatus">模板状态</label>
+                            <select id="templateStatus" class="search-select">
+                                <option value="">全部状态</option>
+                                <option value="draft">草稿</option>
+                                <option value="active">已启用</option>
+                                <option value="inactive">已禁用</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="creator">创建人</label>
+                            <input type="text" id="creator" class="search-input" placeholder="输入创建人姓名">
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="createTime">创建时间</label>
+                            <input type="text" id="createTime" class="search-input" placeholder="选择时间范围">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button class="btn-reset" id="resetFilter">
+                            <i class="fas fa-redo-alt"></i> 重置
+                        </button>
+                        <button class="btn-filter" id="applyFilter">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 数据卡片区域 -->
+                <div class="data-cards">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-primary">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="card-title">模板总数</div>
+                        </div>
+                        <div class="card-value">48</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长8%</span>
+                        </div>
+                        <div class="card-unit">个</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="card-title">已启用模板</div>
+                        </div>
+                        <div class="card-value">35</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长10%</span>
+                        </div>
+                        <div class="card-unit">个</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-warning">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="card-title">草稿模板</div>
+                        </div>
+                        <div class="card-value">6</div>
+                        <div class="card-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>较上月减少2个</span>
+                        </div>
+                        <div class="card-unit">个</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-danger">
+                                <i class="fas fa-ban"></i>
+                            </div>
+                            <div class="card-title">已禁用模板</div>
+                        </div>
+                        <div class="card-value">7</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增加3个</span>
+                        </div>
+                        <div class="card-unit">个</div>
+                    </div>
+                </div>
+                
+                <!-- 表格区域 -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">模板列表</div>
+                        <div class="table-actions">
+                            <button class="table-action-button" id="activeSelectedBtn">
+                                <i class="fas fa-check"></i>
+                                批量启用
+                            </button>
+                            <button class="table-action-button" id="inactiveSelectedBtn">
+                                <i class="fas fa-ban"></i>
+                                批量禁用
+                            </button>
+                            <button class="table-action-button" id="deleteSelectedBtn">
+                                <i class="fas fa-trash-alt"></i>
+                                批量删除
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th width="40">
+                                        <input type="checkbox" class="table-checkbox" id="selectAll">
+                                    </th>
+                                    <th>模板名称</th>
+                                    <th>模板类型</th>
+                                    <th>模板分类</th>
+                                    <th>版本</th>
+                                    <th>创建人</th>
+                                    <th>创建时间</th>
+                                    <th>最后修改时间</th>
+                                    <th>使用次数</th>
+                                    <th>状态</th>
+                                    <th>备注</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>高速公路征地补偿协议</td>
+                                    <td>协议模板</td>
+                                    <td>征地类</td>
+                                    <td>V2.1</td>
+                                    <td>张三</td>
+                                    <td>2023-04-15</td>
+                                    <td>2023-06-10</td>
+                                    <td>156</td>
+                                    <td>
+                                        <span class="table-badge badge-success">已启用</span>
+                                    </td>
+                                    <td>常用征地补偿协议</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action clone" title="复制">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="table-action preview" title="预览">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>房屋拆迁补偿协议</td>
+                                    <td>协议模板</td>
+                                    <td>房屋拆迁类</td>
+                                    <td>V1.8</td>
+                                    <td>李四</td>
+                                    <td>2023-03-20</td>
+                                    <td>2023-05-25</td>
+                                    <td>128</td>
+                                    <td>
+                                        <span class="table-badge badge-success">已启用</span>
+                                    </td>
+                                    <td>常用房屋拆迁协议</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action clone" title="复制">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="table-action preview" title="预览">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>附着物补偿协议</td>
+                                    <td>协议模板</td>
+                                    <td>附着物补偿类</td>
+                                    <td>V1.5</td>
+                                    <td>王五</td>
+                                    <td>2023-02-18</td>
+                                    <td>2023-04-10</td>
+                                    <td>89</td>
+                                    <td>
+                                        <span class="table-badge badge-success">已启用</span>
+                                    </td>
+                                    <td>常用附着物补偿协议</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action clone" title="复制">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="table-action preview" title="预览">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>征拆项目审核表</td>
+                                    <td>表单模板</td>
+                                    <td>审核类</td>
+                                    <td>V3.2</td>
+                                    <td>赵六</td>
+                                    <td>2023-05-05</td>
+                                    <td>2023-06-15</td>
+                                    <td>76</td>
+                                    <td>
+                                        <span class="table-badge badge-success">已启用</span>
+                                    </td>
+                                    <td>项目审核表单</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action clone" title="复制">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="table-action preview" title="预览">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>征地测量记录表</td>
+                                    <td>表单模板</td>
+                                    <td>征地类</td>
+                                    <td>V1.2</td>
+                                    <td>孙七</td>
+                                    <td>2023-01-25</td>
+                                    <td>2023-03-15</td>
+                                    <td>102</td>
+                                    <td>
+                                        <span class="table-badge badge-danger">已禁用</span>
+                                    </td>
+                                    <td>旧版测量记录表，不再使用</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action clone" title="复制">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>新版征地测量记录表</td>
+                                    <td>表单模板</td>
+                                    <td>征地类</td>
+                                    <td>V2.0</td>
+                                    <td>孙七</td>
+                                    <td>2023-04-20</td>
+                                    <td>2023-05-05</td>
+                                    <td>45</td>
+                                    <td>
+                                        <span class="table-badge badge-success">已启用</span>
+                                    </td>
+                                    <td>替代旧版征地测量记录表</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action clone" title="复制">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="table-action preview" title="预览">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>项目结算单</td>
+                                    <td>报表模板</td>
+                                    <td>结算类</td>
+                                    <td>V1.0</td>
+                                    <td>周八</td>
+                                    <td>2023-06-01</td>
+                                    <td>2023-06-15</td>
+                                    <td>12</td>
+                                    <td>
+                                        <span class="table-badge badge-warning">草稿</span>
+                                    </td>
+                                    <td>正在开发中的结算单模板</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action clone" title="复制">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>征拆项目进度报告</td>
+                                    <td>文档模板</td>
+                                    <td>其他类</td>
+                                    <td>V1.3</td>
+                                    <td>吴九</td>
+                                    <td>2023-03-10</td>
+                                    <td>2023-05-20</td>
+                                    <td>38</td>
+                                    <td>
+                                        <span class="table-badge badge-success">已启用</span>
+                                    </td>
+                                    <td>征拆项目进度报告模板</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action clone" title="复制">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="table-action preview" title="预览">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 分页区域 -->
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            显示 1-8 条，共 48 条
+                        </div>
+                        
+                        <div class="pagination-controls">
+                            <button class="pagination-button" disabled>
+                                <i class="fas fa-angle-left"></i>
+                            </button>
+                            <button class="pagination-button active">1</button>
+                            <button class="pagination-button">2</button>
+                            <button class="pagination-button">3</button>
+                            <button class="pagination-button">4</button>
+                            <button class="pagination-button">5</button>
+                            <button class="pagination-button">6</button>
+                            <button class="pagination-button">
+                                <i class="fas fa-angle-right"></i>
+                            </button>
+                            <select class="pagination-select">
+                                <option value="10">10条/页</option>
+                                <option value="20">20条/页</option>
+                                <option value="50">50条/页</option>
+                                <option value="100">100条/页</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 侧边栏切换功能
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const topNav = document.getElementById('topNav');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            topNav.classList.toggle('expanded');
+            
+            // 更新切换按钮图标
+            if (sidebar.classList.contains('collapsed')) {
+                sidebarToggle.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            } else {
+                sidebarToggle.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            }
+        }
+        
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('expanded');
+        }
+        
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+        
+        // 搜索和筛选功能
+        const applyFilter = document.getElementById('applyFilter');
+        const resetFilter = document.getElementById('resetFilter');
+        
+        applyFilter.addEventListener('click', function() {
+            alert('搜索条件已应用，正在加载数据...');
+            // 这里可以添加搜索和筛选的逻辑
+        });
+        
+        resetFilter.addEventListener('click', function() {
+            // 重置所有搜索条件
+            document.getElementById('templateName').value = '';
+            document.getElementById('templateType').value = '';
+            document.getElementById('templateCategory').value = '';
+            document.getElementById('templateStatus').value = '';
+            document.getElementById('creator').value = '';
+            document.getElementById('createTime').value = '';
+        });
+        
+        // 表格操作功能
+        const selectAll = document.getElementById('selectAll');
+        const tableCheckboxes = document.querySelectorAll('.table-checkbox:not(#selectAll)');
+        
+        selectAll.addEventListener('change', function() {
+            const isChecked = this.checked;
+            tableCheckboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+        });
+        
+        // 批量操作按钮
+        const activeSelectedBtn = document.getElementById('activeSelectedBtn');
+        const inactiveSelectedBtn = document.getElementById('inactiveSelectedBtn');
+        const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+        
+        activeSelectedBtn.addEventListener('click', function() {
+            // 检查是否有选中的记录
+            let hasSelected = false;
+            
+            tableCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    hasSelected = true;
+                }
+            });
+            
+            if (hasSelected) {
+                if (confirm('确定要启用选中的模板吗？')) {
+                    alert('选中的模板已启用');
+                    // 这里可以添加批量启用的逻辑
+                }
+            } else {
+                alert('请至少选择一条记录');
+            }
+        });
+        
+        inactiveSelectedBtn.addEventListener('click', function() {
+            // 检查是否有选中的记录
+            let hasSelected = false;
+            
+            tableCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    hasSelected = true;
+                }
+            });
+            
+            if (hasSelected) {
+                if (confirm('确定要禁用选中的模板吗？')) {
+                    alert('选中的模板已禁用');
+                    // 这里可以添加批量禁用的逻辑
+                }
+            } else {
+                alert('请至少选择一条记录');
+            }
+        });
+        
+        deleteSelectedBtn.addEventListener('click', function() {
+            // 检查是否有选中的记录
+            let hasSelected = false;
+            
+            tableCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    hasSelected = true;
+                }
+            });
+            
+            if (hasSelected) {
+                if (confirm('确定要删除选中的模板吗？删除后将无法恢复。')) {
+                    alert('选中的模板已删除');
+                    // 这里可以添加批量删除的逻辑
+                }
+            } else {
+                alert('请至少选择一条记录');
+            }
+        });
+        
+        // 表格行操作按钮
+        const tableActionButtons = document.querySelectorAll('.table-action');
+        
+        tableActionButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const actionType = this.classList.contains('view') ? '查看' : 
+                                   this.classList.contains('edit') ? '编辑' : 
+                                   this.classList.contains('delete') ? '删除' : 
+                                   this.classList.contains('clone') ? '复制' : '预览';
+                
+                if (actionType === '删除') {
+                    if (confirm('确定要删除这条模板吗？删除后将无法恢复。')) {
+                        alert('模板已删除');
+                        // 这里可以添加删除记录的逻辑
+                    }
+                } else if (actionType === '复制') {
+                    alert('模板已复制为新草稿');
+                    // 这里可以添加复制模板的逻辑
+                } else {
+                    alert(`执行${actionType}操作`);
+                }
+            });
+        });
+        
+        // 顶部操作按钮
+        const addTemplateBtn = document.getElementById('addTemplateBtn');
+        const importTemplateBtn = document.getElementById('importTemplateBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        
+        addTemplateBtn.addEventListener('click', function() {
+            alert('跳转到新增模板页面');
+            // 这里可以添加跳转到新增模板页面的逻辑
+        });
+        
+        importTemplateBtn.addEventListener('click', function() {
+            alert('打开模板导入对话框');
+            // 这里可以添加打开导入对话框的逻辑
+        });
+        
+        exportBtn.addEventListener('click', function() {
+            // 检查是否有选中的记录
+            let hasSelected = false;
+            
+            tableCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    hasSelected = true;
+                }
+            });
+            
+            if (hasSelected) {
+                alert('开始导出选中的模板，请稍候...');
+                // 这里可以添加导出选中模板的逻辑
+            } else {
+                alert('开始导出所有模板，请稍候...');
+                // 这里可以添加导出所有模板的逻辑
+            }
+        });
+        
+        refreshBtn.addEventListener('click', function() {
+            // 添加刷新动画
+            this.querySelector('i').classList.add('fa-spin');
+            
+            // 模拟刷新操作
+            setTimeout(() => {
+                this.querySelector('i').classList.remove('fa-spin');
+                alert('数据已刷新');
+            }, 1000);
+        });
+        
+        // 分页控件
+        const paginationButtons = document.querySelectorAll('.pagination-button:not(:disabled)');
+        const paginationSelect = document.querySelector('.pagination-select');
+        
+        paginationButtons.forEach(button => {
+            if (!button.classList.contains('active')) {
+                button.addEventListener('click', function() {
+                    // 移除所有活动状态
+                    document.querySelectorAll('.pagination-button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    // 添加当前活动状态
+                    this.classList.add('active');
+                    
+                    // 如果是上一页或下一页按钮
+                    if (this.querySelector('i')) {
+                        // 这里可以添加翻页逻辑
+                        alert('切换到下一页数据');
+                    }
+                });
+            }
+        });
+        
+        paginationSelect.addEventListener('change', function() {
+            const pageSize = this.value;
+            alert(`每页显示${pageSize}条数据`);
+            // 这里可以添加改变每页显示数量的逻辑
+        });
+        
+        // 响应式处理
+        function handleResize() {
+            const width = window.innerWidth;
+            
+            // 在移动设备上默认收起侧边栏
+            if (width < 768) {
+                sidebar.classList.remove('expanded');
+            } else {
+                sidebar.classList.add('expanded');
+            }
+        }
+        
+        // 初始化响应式处理
+        handleResize();
+        // 监听窗口大小变化
+        window.addEventListener('resize', handleResize);
+    </script>
+</body>
+</html>

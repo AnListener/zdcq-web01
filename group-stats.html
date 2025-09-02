@@ -1,0 +1,2030 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高速公路征地拆迁管理系统 - 集团统计</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 集团统计特定样式 */
+        .group-stats-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 搜索和筛选区域 */
+        .search-filter-container {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .search-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .search-group {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .search-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+            min-width: 100px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .search-select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+        
+        .search-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .search-date {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .search-date:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .btn-filter {
+            padding: 8px 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-filter:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-reset {
+            padding: 8px 16px;
+            background-color: white;
+            color: var(--info);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-reset:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* 数据卡片区域 */
+        .data-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .data-card {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .data-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+        
+        .card-icon-primary {
+            background-color: var(--primary);
+        }
+        
+        .card-icon-info {
+            background-color: var(--info);
+        }
+        
+        .card-icon-success {
+            background-color: var(--success);
+        }
+        
+        .card-icon-warning {
+            background-color: var(--warning);
+        }
+        
+        .card-title {
+            font-size: 14px;
+            color: var(--info);
+            font-weight: 500;
+        }
+        
+        .card-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .card-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .card-change.positive {
+            color: var(--success);
+        }
+        
+        .card-change.negative {
+            color: var(--danger);
+        }
+        
+        .card-unit {
+            font-size: 12px;
+            color: var(--info);
+            margin-top: 4px;
+        }
+        
+        /* 图表区域 */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .chart-card {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .chart-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .chart-action-button {
+            width: 28px;
+            height: 28px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .chart-action-button:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .chart-content {
+            height: 300px;
+            position: relative;
+        }
+        
+        /* 图表占位区域 */
+        .chart-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-light);
+            border-radius: 4px;
+            color: var(--info);
+            font-size: 14px;
+            position: relative;
+        }
+        
+        .chart-placeholder::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0,0,0,0.03) 25%, transparent 25%, transparent 50%, rgba(0,0,0,0.03) 50%, rgba(0,0,0,0.03) 75%, transparent 75%, transparent);
+            background-size: 20px 20px;
+        }
+        
+        /* 表格区域 */
+        .table-container {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background-color: var(--bg-light);
+        }
+        
+        .table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-action-button {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .table-action-button:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background-color: var(--bg-light);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        
+        .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--dark);
+        }
+        
+        .data-table tr:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-primary {
+            background-color: rgba(22, 93, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        .badge-success {
+            background-color: rgba(0, 180, 42, 0.1);
+            color: var(--success);
+        }
+        
+        .badge-warning {
+            background-color: rgba(255, 125, 0, 0.1);
+            color: var(--warning);
+        }
+        
+        .badge-danger {
+            background-color: rgba(245, 63, 63, 0.1);
+            color: var(--danger);
+        }
+        
+        .table-actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-action {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .table-action:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .table-action.view {
+            color: var(--primary);
+        }
+        
+        .table-action.detail {
+            color: var(--info);
+        }
+        
+        .table-action.export {
+            color: var(--success);
+        }
+        
+        /* 金额显示样式 */
+        .amount {
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        /* 进度条 */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--bg-light);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        /* 百分比显示 */
+        .percentage {
+            font-size: 12px;
+            color: var(--info);
+            margin-left: 8px;
+        }
+        
+        /* 分页区域 */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            background-color: var(--bg-light);
+        }
+        
+        .pagination-info {
+            font-size: 14px;
+            color: var(--info);
+        }
+        
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .pagination-button {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .pagination-button:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .pagination-button.active {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-select {
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        /* 响应式样式 */
+        @media (max-width: 768px) {
+            .search-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .search-group {
+                width: 100%;
+            }
+            
+            .data-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-card {
+                min-width: auto;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .table-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .pagination-container {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .pagination-controls {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* 区域分布样式 */
+        .region-distribution {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .region-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 4px;
+            background-color: var(--bg-light);
+        }
+        
+        .region-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .region-value {
+            font-size: 14px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        /* 时间范围选择器 */
+        .time-range-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .time-range-button {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .time-range-button:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .time-range-button.active {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* 导出报表样式 */
+        .export-reports {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .report-item {
+            flex: 1;
+            min-width: 200px;
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .report-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .report-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .report-date {
+            font-size: 12px;
+            color: var(--info);
+        }
+        
+        .report-action {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .report-action:hover {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* 集团级别统计样式 */
+        .group-stats-level {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+        }
+        
+        .group-level-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .group-level-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .group-level-tabs {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .group-level-tab {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px 4px 0 0;
+            background-color: var(--bg-light);
+            color: var(--info);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .group-level-tab:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .group-level-tab.active {
+            border-color: var(--primary);
+            border-bottom-color: white;
+            background-color: white;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .group-level-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+        
+        .group-level-card {
+            background-color: var(--bg-light);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .group-level-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .group-level-name {
+            font-size: 14px;
+            color: var(--info);
+        }
+        
+        .group-level-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .group-level-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+        
+        /* 集团绩效评估样式 */
+        .performance-evaluation {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+        }
+        
+        .performance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .performance-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .performance-tabs {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .performance-tab {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px 4px 0 0;
+            background-color: var(--bg-light);
+            color: var(--info);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .performance-tab:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .performance-tab.active {
+            border-color: var(--primary);
+            border-bottom-color: white;
+            background-color: white;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        
+        .performance-item {
+            background-color: var(--bg-light);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .performance-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .performance-item-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .performance-item-score {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--success);
+        }
+        
+        .performance-item-content {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .performance-item-detail {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .performance-item-label {
+            font-size: 12px;
+            color: var(--info);
+        }
+        
+        .performance-item-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .performance-action {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .performance-detail-button {
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .performance-detail-button:hover {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* 趋势图表样式 */
+        .trend-charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .trend-chart {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .trend-chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .trend-chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .trend-chart-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .trend-chart-action {
+            width: 28px;
+            height: 28px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .trend-chart-action:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .trend-chart-content {
+            height: 250px;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div class="group-stats-container">
+        <!-- 侧边栏导航 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-road logo-icon"></i>
+                    <span class="logo-text">征拆管理系统</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <div class="menu-section-title">主导航</div>
+                
+                <a href="dashboard.html" class="menu-item">
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">仪表盘</span>
+                </a>
+                
+                <div class="menu-section-title">GIS数据管理</div>
+                
+                <a href="gis-data-upload.html" class="menu-item">
+                    <i class="fas fa-upload menu-icon"></i>
+                    <span class="menu-text">测绘数据上传</span>
+                </a>
+                
+                <a href="gis-publish.html" class="menu-item">
+                    <i class="fas fa-map-marked-alt menu-icon"></i>
+                    <span class="menu-text">GIS发布</span>
+                </a>
+                
+                <div class="menu-section-title">台账管理</div>
+                
+                <a href="gis-ledger.html" class="menu-item">
+                    <i class="fas fa-database menu-icon"></i>
+                    <span class="menu-text">GIS台账</span>
+                </a>
+                
+                <a href="land-ledger.html" class="menu-item">
+                    <i class="fas fa-paragraph menu-icon"></i>
+                    <span class="menu-text">征地台账</span>
+                </a>
+                
+                <a href="house-ledger.html" class="menu-item">
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">房屋台账</span>
+                </a>
+                
+                <a href="attachment-ledger.html" class="menu-item">
+                    <i class="fas fa-paperclip menu-icon"></i>
+                    <span class="menu-text">附着物台账</span>
+                </a>
+                
+                <a href="audit-ledger.html" class="menu-item">
+                    <i class="fas fa-search menu-icon"></i>
+                    <span class="menu-text">审核台账</span>
+                </a>
+                
+                <a href="agreement-ledger.html" class="menu-item">
+                    <i class="fas fa-file-contract menu-icon"></i>
+                    <span class="menu-text">协议台账</span>
+                </a>
+                
+                <a href="settlement-ledger.html" class="menu-item">
+                    <i class="fas fa-money-bill-wave menu-icon"></i>
+                    <span class="menu-text">结算台账</span>
+                </a>
+                
+                <div class="menu-section-title">基础配置管理</div>
+                
+                <a href="form-template.html" class="menu-item">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">表单协议模板管理</span>
+                </a>
+                
+                <a href="process-config.html" class="menu-item">
+                    <i class="fas fa-sitemap menu-icon"></i>
+                    <span class="menu-text">流程配置</span>
+                </a>
+                
+                <a href="compensation-standard.html" class="menu-item">
+                    <i class="fas fa-list-ol menu-icon"></i>
+                    <span class="menu-text">区域补偿标准库</span>
+                </a>
+                
+                <div class="menu-section-title">统计分析</div>
+                
+                <a href="demolition-stats.html" class="menu-item">
+                    <i class="fas fa-chart-bar menu-icon"></i>
+                    <span class="menu-text">征拆区域统计</span>
+                </a>
+                
+                <a href="project-stats.html" class="menu-item">
+                    <i class="fas fa-chart-line menu-icon"></i>
+                    <span class="menu-text">项目统计</span>
+                </a>
+                
+                <a href="group-stats.html" class="menu-item active">
+                    <i class="fas fa-chart-pie menu-icon"></i>
+                    <span class="menu-text">集团统计</span>
+                </a>
+                
+                <div class="menu-section-title">系统管理</div>
+                
+                <a href="user-role.html" class="menu-item">
+                    <i class="fas fa-users-cog menu-icon"></i>
+                    <span class="menu-text">用户角色管理</span>
+                </a>
+                
+                <a href="project-auth.html" class="menu-item">
+                    <i class="fas fa-key menu-icon"></i>
+                    <span class="menu-text">项目授权管理</span>
+                </a>
+                
+                <div class="menu-section-title">辅助支持</div>
+                
+                <a href="function-demo.html" class="menu-item">
+                    <i class="fas fa-play-circle menu-icon"></i>
+                    <span class="menu-text">功能演示入口</span>
+                </a>
+                
+                <a href="training-materials.html" class="menu-item">
+                    <i class="fas fa-book menu-icon"></i>
+                    <span class="menu-text">培训资料</span>
+                </a>
+                
+                <a href="operation-manual.html" class="menu-item">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">操作手册</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="main-content" id="mainContent">
+            <!-- 顶部导航栏 -->
+            <header class="top-nav" id="topNav">
+                <div class="nav-left">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="nav-title">集团统计</h1>
+                </div>
+                
+                <div class="nav-right">
+                    <div class="nav-item">
+                        <i class="fas fa-bell nav-icon"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-envelope nav-icon"></i>
+                        <span class="notification-badge">2</span>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-cog nav-icon"></i>
+                    </div>
+                    
+                    <div class="user-profile">
+                        <div class="avatar">张</div>
+                        <div class="user-info">
+                            <div class="user-name">张三</div>
+                            <div class="user-role">系统管理员</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- 页面内容 -->
+            <div class="page-content">
+                <div class="page-header">
+                    <h2 class="page-title">集团统计</h2>
+                    <div class="flex gap-3">
+                        <button class="btn btn-primary" id="exportAllBtn">
+                            <i class="fas fa-file-export"></i> 导出全部
+                        </button>
+                        <button class="btn btn-secondary" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i> 刷新
+                        </button>
+                        <button class="btn btn-secondary" id="printBtn">
+                            <i class="fas fa-print"></i> 打印
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 搜索和筛选区域 -->
+                <div class="search-filter-container">
+                    <!-- 时间范围选择器 -->
+                    <div class="time-range-selector">
+                        <button class="time-range-button active">今日</button>
+                        <button class="time-range-button">本周</button>
+                        <button class="time-range-button">本月</button>
+                        <button class="time-range-button">本季度</button>
+                        <button class="time-range-button">本年</button>
+                        <button class="time-range-button">自定义</button>
+                    </div>
+                    
+                    <div class="search-row">
+                        <div class="search-group">
+                            <label for="group">集团</label>
+                            <select id="group" class="search-select">
+                                <option value="">全部集团</option>
+                                <option value="group1">湖北高速集团</option>
+                                <option value="group2">江苏高速集团</option>
+                                <option value="group3">浙江高速集团</option>
+                                <option value="group4">安徽高速集团</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="region">所属区域</label>
+                            <select id="region" class="search-select">
+                                <option value="">全部区域</option>
+                                <option value="hubei">湖北省</option>
+                                <option value="jiangsu">江苏省</option>
+                                <option value="zhejiang">浙江省</option>
+                                <option value="anhui">安徽省</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="projectType">项目类型</label>
+                            <select id="projectType" class="search-select">
+                                <option value="">全部类型</option>
+                                <option value="expressway">高速公路</option>
+                                <option value="bridge">桥梁</option>
+                                <option value="tunnel">隧道</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="search-row">
+                        <div class="search-group">
+                            <label for="startDate">开始日期</label>
+                            <input type="date" id="startDate" class="search-date" value="2023-01-01">
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="endDate">结束日期</label>
+                            <input type="date" id="endDate" class="search-date" value="2023-12-31">
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="statType">统计类型</label>
+                            <select id="statType" class="search-select">
+                                <option value="total">综合统计</option>
+                                <option value="progress">进度统计</option>
+                                <option value="cost">成本统计</option>
+                                <option value="time">时间统计</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button class="btn-reset" id="resetFilter">
+                            <i class="fas fa-redo-alt"></i> 重置
+                        </button>
+                        <button class="btn-filter" id="applyFilter">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 数据概览卡片 -->
+                <div class="data-cards">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-primary">
+                                <i class="fas fa-project-diagram"></i>
+                            </div>
+                            <div class="card-title">总项目数</div>
+                        </div>
+                        <div class="card-value">65</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长12个</span>
+                        </div>
+                        <div class="card-unit">个</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="card-title">已完成项目</div>
+                        </div>
+                        <div class="card-value">28</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长4个</span>
+                        </div>
+                        <div class="card-unit">个</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-warning">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="card-title">进行中项目</div>
+                        </div>
+                        <div class="card-value">32</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长8个</span>
+                        </div>
+                        <div class="card-unit">个</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-danger">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="card-title">延期项目</div>
+                        </div>
+                        <div class="card-value">5</div>
+                        <div class="card-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>较上月减少1个</span>
+                        </div>
+                        <div class="card-unit">个</div>
+                    </div>
+                </div>
+                
+                <!-- 集团级别统计 -->
+                <div class="group-stats-level">
+                    <div class="group-level-header">
+                        <div class="group-level-title">集团级统计指标</div>
+                        <div class="group-level-tabs">
+                            <button class="group-level-tab active">今日</button>
+                            <button class="group-level-tab">本周</button>
+                            <button class="group-level-tab">本月</button>
+                            <button class="group-level-tab">本年</button>
+                        </div>
+                    </div>
+                    
+                    <div class="group-level-content">
+                        <div class="group-level-card">
+                            <div class="group-level-info">
+                                <div class="group-level-name">总征地面积</div>
+                                <div class="group-level-value">8,945 公顷</div>
+                            </div>
+                            <div class="group-level-icon" style="background-color: var(--primary);">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="group-level-card">
+                            <div class="group-level-info">
+                                <div class="group-level-name">总拆迁面积</div>
+                                <div class="group-level-value">2,345,678 平方米</div>
+                            </div>
+                            <div class="group-level-icon" style="background-color: var(--success);">
+                                <i class="fas fa-home"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="group-level-card">
+                            <div class="group-level-info">
+                                <div class="group-level-name">总补偿金额</div>
+                                <div class="group-level-value">¥ 56.78 亿</div>
+                            </div>
+                            <div class="group-level-icon" style="background-color: var(--info);">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="group-level-card">
+                            <div class="group-level-info">
+                                <div class="group-level-name">平均完成率</div>
+                                <div class="group-level-value">76.5%</div>
+                            </div>
+                            <div class="group-level-icon" style="background-color: var(--warning);">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="group-level-card">
+                            <div class="group-level-info">
+                                <div class="group-level-name">平均成本控制率</div>
+                                <div class="group-level-value">92.3%</div>
+                            </div>
+                            <div class="group-level-icon" style="background-color: var(--primary);">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="group-level-card">
+                            <div class="group-level-info">
+                                <div class="group-level-name">平均工期控制率</div>
+                                <div class="group-level-value">88.7%</div>
+                            </div>
+                            <div class="group-level-icon" style="background-color: var(--success);">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 集团绩效评估 -->
+                <div class="performance-evaluation">
+                    <div class="performance-header">
+                        <div class="performance-title">集团绩效评估</div>
+                        <div class="performance-tabs">
+                            <button class="performance-tab active">本月</button>
+                            <button class="performance-tab">本季度</button>
+                            <button class="performance-tab">本年</button>
+                        </div>
+                    </div>
+                    
+                    <div class="performance-grid">
+                        <div class="performance-item">
+                            <div class="performance-item-header">
+                                <div class="performance-item-title">湖北高速集团</div>
+                                <div class="performance-item-score">87.5</div>
+                            </div>
+                            <div class="performance-item-content">
+                                <div class="performance-item-detail">
+                                    <div class="performance-item-label">进度完成率</div>
+                                    <div class="performance-item-value">82%</div>
+                                </div>
+                                <div class="performance-item-detail">
+                                    <div class="performance-item-label">成本控制率</div>
+                                    <div class="performance-item-value">91%</div>
+                                </div>
+                                <div class="performance-item-detail">
+                                    <div class="performance-item-label">工期控制率</div>
+                                    <div class="performance-item-value">90%</div>
+                                </div>
+                            </div>
+                            <div class="performance-action">
+                                <button class="performance-detail-button">
+                                    <i class="fas fa-eye"></i> 详情
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="performance-item">
+                            <div class="performance-item-header">
+                                <div class="performance-item-title">江苏高速集团</div>
+                                <div class="performance-item-score">91.2</div>
+                            </div>
+                            <div class="performance-item-content">
+                                <div class="performance-item-detail">
+                                    <div class="performance-item-label">进度完成率</div>
+                                    <div class="performance-item-value">88%</div>
+                                </div>
+                                <div class="performance-item-detail">
+                                    <div class="performance-item-label">成本控制率</div>
+                                    <div class="performance-item-value">95%</div>
+                                </div>
+                                <div class="performance-item-detail">
+                                    <div class="performance-item-label">工期控制率</div>
+                                    <div class="performance-item-value">91%</div>
+                                </div>
+                            </div>
+                            <div class="performance-action">
+                                <button class="performance-detail-button">
+                                    <i class="fas fa-eye"></i> 详情
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="performance-item">
+                            <div class="performance-item-header">
+                                <div class="performance-item-title">浙江高速集团</div>
+                                <div class="performance-item-score">89.7</div>
+                            </div>
+                            <div class="performance-item-content">
+                                <div class="performance-item-detail">
+                                    <div class="performance-item-label">进度完成率</div>
+                                    <div class="performance-item-value">85%</div>
+                                </div>
+                                <div class="performance-item-detail">
+                                    <div class="performance-item-label">成本控制率</div>
+                                    <div class="performance-item-value">93%</div>
+                                </div>
+                                <div class="performance-item-detail">
+                                    <div class="performance-item-label">工期控制率</div>
+                                    <div class="performance-item-value">89%</div>
+                                </div>
+                            </div>
+                            <div class="performance-action">
+                                <button class="performance-detail-button">
+                                    <i class="fas fa-eye"></i> 详情
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="performance-item">
+                            <div class="performance-item-header">
+                                <div class="performance-item-title">安徽高速集团</div>
+                                <div class="performance-item-score">85.3</div>
+                            </div>
+                            <div class="performance-item-content">
+                                <div class="performance-item-detail">
+                                    <div class="performance-item-label">进度完成率</div>
+                                    <div class="performance-item-value">79%</div>
+                                </div>
+                                <div class="performance-item-detail">
+                                    <div class="performance-item-label">成本控制率</div>
+                                    <div class="performance-item-value">90%</div>
+                                </div>
+                                <div class="performance-item-detail">
+                                    <div class="performance-item-label">工期控制率</div>
+                                    <div class="performance-item-value">87%</div>
+                                </div>
+                            </div>
+                            <div class="performance-action">
+                                <button class="performance-detail-button">
+                                    <i class="fas fa-eye"></i> 详情
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 趋势图表 -->
+                <div class="trend-charts">
+                    <div class="trend-chart">
+                        <div class="trend-chart-header">
+                            <div class="trend-chart-title">集团征地面积趋势</div>
+                            <div class="trend-chart-actions">
+                                <button class="trend-chart-action" title="查看">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="trend-chart-action" title="导出">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="trend-chart-action" title="全屏">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="trend-chart-content">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-line" style="font-size: 48px; margin-bottom: 16px;"></i>
+                                <div>集团征地面积趋势图</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="trend-chart">
+                        <div class="trend-chart-header">
+                            <div class="trend-chart-title">集团拆迁面积趋势</div>
+                            <div class="trend-chart-actions">
+                                <button class="trend-chart-action" title="查看">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="trend-chart-action" title="导出">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="trend-chart-action" title="全屏">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="trend-chart-content">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-line" style="font-size: 48px; margin-bottom: 16px;"></i>
+                                <div>集团拆迁面积趋势图</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="trend-chart">
+                        <div class="trend-chart-header">
+                            <div class="trend-chart-title">集团补偿金额趋势</div>
+                            <div class="trend-chart-actions">
+                                <button class="trend-chart-action" title="查看">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="trend-chart-action" title="导出">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="trend-chart-action" title="全屏">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="trend-chart-content">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-line" style="font-size: 48px; margin-bottom: 16px;"></i>
+                                <div>集团补偿金额趋势图</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="trend-chart">
+                        <div class="trend-chart-header">
+                            <div class="trend-chart-title">集团项目完成率趋势</div>
+                            <div class="trend-chart-actions">
+                                <button class="trend-chart-action" title="查看">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="trend-chart-action" title="导出">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="trend-chart-action" title="全屏">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="trend-chart-content">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-line" style="font-size: 48px; margin-bottom: 16px;"></i>
+                                <div>集团项目完成率趋势图</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 区域分布图表 -->
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">集团项目区域分布</div>
+                            <div class="chart-actions">
+                                <button class="chart-action-button" title="查看">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="chart-action-button" title="导出">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="chart-action-button" title="全屏">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-content">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-pie" style="font-size: 48px; margin-bottom: 16px;"></i>
+                                <div>集团项目区域分布图</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">集团补偿金额区域分布</div>
+                            <div class="chart-actions">
+                                <button class="chart-action-button" title="查看">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="chart-action-button" title="导出">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="chart-action-button" title="全屏">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-content">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-bar" style="font-size: 48px; margin-bottom: 16px;"></i>
+                                <div>集团补偿金额区域分布图</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 集团详细统计表格 -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">集团详细统计</div>
+                        <div class="table-actions">
+                            <button class="table-action-button" id="exportTableBtn">
+                                <i class="fas fa-file-export"></i>
+                                导出表格
+                            </button>
+                            <button class="table-action-button" id="customizeColumnsBtn">
+                                <i class="fas fa-columns"></i>
+                                自定义列
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>集团名称</th>
+                                    <th>所属区域</th>
+                                    <th>项目数量</th>
+                                    <th>已完成项目</th>
+                                    <th>进行中项目</th>
+                                    <th>延期项目</th>
+                                    <th>总征地面积(公顷)</th>
+                                    <th>总拆迁面积(平方米)</th>
+                                    <th>总补偿金额(万元)</th>
+                                    <th>平均完成率</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>湖北高速集团</td>
+                                    <td>湖北省</td>
+                                    <td>22</td>
+                                    <td>9</td>
+                                    <td>11</td>
+                                    <td>2</td>
+                                    <td>2,890.56</td>
+                                    <td>789,012.34</td>
+                                    <td class="amount">189,765.43</td>
+                                    <td>
+                                        <div class="project-progress">
+                                            <div class="progress-text">82%</div>
+                                            <div class="progress-bar-container">
+                                                <div class="progress-bar" style="width: 82%;"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action detail" title="明细">
+                                            <i class="fas fa-list"></i>
+                                        </button>
+                                        <button class="table-action export" title="导出">
+                                            <i class="fas fa-file-export"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 分页控件 -->
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            显示 1 到 4，共 4 条记录
+                        </div>
+                        
+                        <div class="pagination-controls">
+                            <button class="pagination-button" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="pagination-button active">1</button>
+                            <button class="pagination-button" disabled>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <select class="pagination-select">
+                                <option value="10">10条/页</option>
+                                <option value="20">20条/页</option>
+                                <option value="50">50条/页</option>
+                                <option value="100">100条/页</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 导出报表 -->
+                <div class="export-reports">
+                    <div class="report-item">
+                        <div class="report-info">
+                            <div class="report-name">集团年度统计报表</div>
+                            <div class="report-date">更新日期：2023-12-31</div>
+                        </div>
+                        <button class="report-action" title="导出">
+                            <i class="fas fa-file-export"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="report-item">
+                        <div class="report-info">
+                            <div class="report-name">集团季度统计报表</div>
+                            <div class="report-date">更新日期：2023-12-31</div>
+                        </div>
+                        <button class="report-action" title="导出">
+                            <i class="fas fa-file-export"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="report-item">
+                        <div class="report-info">
+                            <div class="report-name">集团项目进度报表</div>
+                            <div class="report-date">更新日期：2023-12-31</div>
+                        </div>
+                        <button class="report-action" title="导出">
+                            <i class="fas fa-file-export"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="report-item">
+                        <div class="report-info">
+                            <div class="report-name">集团成本分析报表</div>
+                            <div class="report-date">更新日期：2023-12-31</div>
+                        </div>
+                        <button class="report-action" title="导出">
+                            <i class="fas fa-file-export"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // 侧边栏切换功能
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const topNav = document.getElementById('topNav');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('sidebar-collapsed');
+            topNav.classList.toggle('sidebar-collapsed');
+        });
+        
+        mobileMenuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('mobile-open');
+        });
+        
+        // 搜索筛选功能
+        const applyFilter = document.getElementById('applyFilter');
+        const resetFilter = document.getElementById('resetFilter');
+        
+        applyFilter.addEventListener('click', () => {
+            // 实现搜索筛选逻辑
+            console.log('应用筛选条件');
+        });
+        
+        resetFilter.addEventListener('click', () => {
+            // 实现重置筛选条件逻辑
+            document.getElementById('group').value = '';
+            document.getElementById('region').value = '';
+            document.getElementById('projectType').value = '';
+            document.getElementById('startDate').value = '2023-01-01';
+            document.getElementById('endDate').value = '2023-12-31';
+            document.getElementById('statType').value = 'total';
+            console.log('重置筛选条件');
+        });
+        
+        // 时间范围选择器功能
+        const timeRangeButtons = document.querySelectorAll('.time-range-button');
+        
+        timeRangeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                timeRangeButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                console.log('选择时间范围：', button.textContent);
+            });
+        });
+        
+        // 集团级别标签切换功能
+        const groupLevelTabs = document.querySelectorAll('.group-level-tab');
+        
+        groupLevelTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                groupLevelTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                console.log('选择集团级别统计时间：', tab.textContent);
+            });
+        });
+        
+        // 绩效评估标签切换功能
+        const performanceTabs = document.querySelectorAll('.performance-tab');
+        
+        performanceTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                performanceTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                console.log('选择绩效评估时间：', tab.textContent);
+            });
+        });
+        
+        // 按钮点击事件处理
+        document.getElementById('exportAllBtn').addEventListener('click', () => {
+            console.log('导出全部数据');
+            alert('正在导出全部数据，请稍候...');
+        });
+        
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            console.log('刷新数据');
+            // 模拟刷新效果
+            location.reload();
+        });
+        
+        document.getElementById('printBtn').addEventListener('click', () => {
+            console.log('打印页面');
+            window.print();
+        });
+        
+        // 表格相关操作
+        document.getElementById('exportTableBtn').addEventListener('click', () => {
+            console.log('导出表格数据');
+            alert('正在导出表格数据，请稍候...');
+        });
+        
+        document.getElementById('customizeColumnsBtn').addEventListener('click', () => {
+            console.log('自定义表格列');
+            alert('打开列自定义对话框');
+        });
+        
+        // 表格行操作按钮点击事件
+        const tableActions = document.querySelectorAll('.table-action');
+        
+        tableActions.forEach(action => {
+            action.addEventListener('click', () => {
+                const actionType = action.classList.contains('view') ? '查看' : 
+                                  action.classList.contains('detail') ? '明细' : '导出';
+                console.log('表格操作：', actionType);
+            });
+        });
+        
+        // 报表导出按钮点击事件
+        const reportActions = document.querySelectorAll('.report-action');
+        
+        reportActions.forEach(action => {
+            action.addEventListener('click', () => {
+                const reportName = action.closest('.report-item').querySelector('.report-name').textContent;
+                console.log('导出报表：', reportName);
+                alert(`正在导出${reportName}，请稍候...`);
+            });
+        });
+        
+        // 绩效详情按钮点击事件
+        const performanceDetailButtons = document.querySelectorAll('.performance-detail-button');
+        
+        performanceDetailButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const performanceName = button.closest('.performance-item').querySelector('.performance-item-title').textContent;
+                console.log('查看绩效详情：', performanceName);
+                alert(`打开${performanceName}绩效详情页面`);
+            });
+        });
+        
+        // 图表操作按钮点击事件
+        const chartActions = document.querySelectorAll('.chart-action-button, .trend-chart-action');
+        
+        chartActions.forEach(action => {
+            action.addEventListener('click', () => {
+                const actionTitle = action.getAttribute('title');
+                console.log('图表操作：', actionTitle);
+            });
+        });
+        
+        // 模拟图表加载
+        document.addEventListener('DOMContentLoaded', () => {
+            // 这里可以集成实际的图表库，如ECharts、Chart.js等
+            console.log('页面加载完成，可以初始化图表');
+        });
+    </script>
+</body>
+</html> fa-file-export"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>2</td>
+                                    <td>江苏高速集团</td>
+                                    <td>江苏省</td>
+                                    <td>18</td>
+                                    <td>8</td>
+                                    <td>9</td>
+                                    <td>1</td>
+                                    <td>2,345.67</td>
+                                    <td>654,321.78</td>
+                                    <td class="amount">156,432.89</td>
+                                    <td>
+                                        <div class="project-progress">
+                                            <div class="progress-text">88%</div>
+                                            <div class="progress-bar-container">
+                                                <div class="progress-bar" style="width: 88%;"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action detail" title="明细">
+                                            <i class="fas fa-list"></i>
+                                        </button>
+                                        <button class="table-action export" title="导出">
+                                            <i class="fas fa-file-export"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>3</td>
+                                    <td>浙江高速集团</td>
+                                    <td>浙江省</td>
+                                    <td>16</td>
+                                    <td>7</td>
+                                    <td>8</td>
+                                    <td>1</td>
+                                    <td>2,109.87</td>
+                                    <td>567,890.45</td>
+                                    <td class="amount">145,234.78</td>
+                                    <td>
+                                        <div class="project-progress">
+                                            <div class="progress-text">85%</div>
+                                            <div class="progress-bar-container">
+                                                <div class="progress-bar" style="width: 85%;"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action detail" title="明细">
+                                            <i class="fas fa-list"></i>
+                                        </button>
+                                        <button class="table-action export" title="导出">
+                                            <i class="fas fa-file-export"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>4</td>
+                                    <td>安徽高速集团</td>
+                                    <td>安徽省</td>
+                                    <td>9</td>
+                                    <td>4</td>
+                                    <td>4</td>
+                                    <td>1</td>
+                                    <td>1,599.34</td>
+                                    <td>334,453.67</td>
+                                    <td class="amount">76,453.21</td>
+                                    <td>
+                                        <div class="project-progress">
+                                            <div class="progress-text">79%</div>
+                                            <div class="progress-bar-container">
+                                                <div class="progress-bar" style="width: 79%;"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action detail" title="明细">
+                                            <i class="fas fa-list"></i>
+                                        </button>
+                                        <button class="table-action export" title="导出">
+                                            <i class="fas

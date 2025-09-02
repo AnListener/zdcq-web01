@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高速公路征地拆迁管理系统 - 房屋台账</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 房屋台账特定样式 */
+        .house-ledger-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 搜索和筛选区域 */
+        .search-filter-container {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .search-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .search-group {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .search-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+            min-width: 80px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .search-select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+        
+        .search-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .btn-filter {
+            padding: 8px 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-filter:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-reset {
+            padding: 8px 16px;
+            background-color: white;
+            color: var(--info);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-reset:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* 数据卡片区域 */
+        .data-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .data-card {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .data-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+        
+        .card-icon-primary {
+            background-color: var(--primary);
+        }
+        
+        .card-icon-info {
+            background-color: var(--info);
+        }
+        
+        .card-icon-success {
+            background-color: var(--success);
+        }
+        
+        .card-icon-warning {
+            background-color: var(--warning);
+        }
+        
+        .card-title {
+            font-size: 14px;
+            color: var(--info);
+            font-weight: 500;
+        }
+        
+        .card-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .card-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .card-change.positive {
+            color: var(--success);
+        }
+        
+        .card-change.negative {
+            color: var(--danger);
+        }
+        
+        /* 表格区域 */
+        .table-container {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background-color: var(--bg-light);
+        }
+        
+        .table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-action-button {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .table-action-button:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background-color: var(--bg-light);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        
+        .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--dark);
+        }
+        
+        .data-table tr:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        .table-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-primary {
+            background-color: rgba(22, 93, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        .badge-success {
+            background-color: rgba(0, 180, 42, 0.1);
+            color: var(--success);
+        }
+        
+        .badge-warning {
+            background-color: rgba(255, 125, 0, 0.1);
+            color: var(--warning);
+        }
+        
+        .badge-danger {
+            background-color: rgba(245, 63, 63, 0.1);
+            color: var(--danger);
+        }
+        
+        .table-actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-action {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .table-action:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .table-action.view {
+            color: var(--primary);
+        }
+        
+        .table-action.edit {
+            color: var(--warning);
+        }
+        
+        .table-action.delete {
+            color: var(--danger);
+        }
+        
+        .table-action.detail {
+            color: var(--info);
+        }
+        
+        /* 分页区域 */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            background-color: var(--bg-light);
+        }
+        
+        .pagination-info {
+            font-size: 14px;
+            color: var(--info);
+        }
+        
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .pagination-button {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .pagination-button:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .pagination-button.active {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-select {
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        /* 响应式样式 */
+        @media (max-width: 768px) {
+            .search-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .search-group {
+                width: 100%;
+            }
+            
+            .data-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .table-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .pagination-container {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .pagination-controls {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="house-ledger-container">
+        <!-- 侧边栏导航 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-road logo-icon"></i>
+                    <span class="logo-text">征拆管理系统</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <div class="menu-section-title">主导航</div>
+                
+                <a href="dashboard.html" class="menu-item">
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">仪表盘</span>
+                </a>
+                
+                <div class="menu-section-title">GIS数据管理</div>
+                
+                <a href="gis-data-upload.html" class="menu-item">
+                    <i class="fas fa-upload menu-icon"></i>
+                    <span class="menu-text">测绘数据上传</span>
+                </a>
+                
+                <a href="gis-publish.html" class="menu-item">
+                    <i class="fas fa-map-marked-alt menu-icon"></i>
+                    <span class="menu-text">GIS发布</span>
+                </a>
+                
+                <div class="menu-section-title">台账管理</div>
+                
+                <a href="gis-ledger.html" class="menu-item">
+                    <i class="fas fa-database menu-icon"></i>
+                    <span class="menu-text">GIS台账</span>
+                </a>
+                
+                <a href="land-ledger.html" class="menu-item">
+                    <i class="fas fa-paragraph menu-icon"></i>
+                    <span class="menu-text">征地台账</span>
+                </a>
+                
+                <a href="house-ledger.html" class="menu-item active">
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">房屋台账</span>
+                </a>
+                
+                <a href="attachment-ledger.html" class="menu-item">
+                    <i class="fas fa-paperclip menu-icon"></i>
+                    <span class="menu-text">附着物台账</span>
+                </a>
+                
+                <a href="audit-ledger.html" class="menu-item">
+                    <i class="fas fa-search menu-icon"></i>
+                    <span class="menu-text">审核台账</span>
+                </a>
+                
+                <a href="agreement-ledger.html" class="menu-item">
+                    <i class="fas fa-file-contract menu-icon"></i>
+                    <span class="menu-text">协议台账</span>
+                </a>
+                
+                <a href="settlement-ledger.html" class="menu-item">
+                    <i class="fas fa-money-bill-wave menu-icon"></i>
+                    <span class="menu-text">结算台账</span>
+                    <span class="menu-badge">5</span>
+                </a>
+                
+                <div class="menu-section-title">基础配置管理</div>
+                
+                <a href="form-template.html" class="menu-item">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">表单协议模板管理</span>
+                </a>
+                
+                <a href="process-config.html" class="menu-item">
+                    <i class="fas fa-sitemap menu-icon"></i>
+                    <span class="menu-text">流程配置</span>
+                </a>
+                
+                <a href="compensation-standard.html" class="menu-item">
+                    <i class="fas fa-list-ol menu-icon"></i>
+                    <span class="menu-text">区域补偿标准库</span>
+                </a>
+                
+                <div class="menu-section-title">统计分析</div>
+                
+                <a href="demolition-stats.html" class="menu-item">
+                    <i class="fas fa-chart-bar menu-icon"></i>
+                    <span class="menu-text">征拆区域统计</span>
+                </a>
+                
+                <a href="project-stats.html" class="menu-item">
+                    <i class="fas fa-chart-line menu-icon"></i>
+                    <span class="menu-text">项目统计</span>
+                </a>
+                
+                <a href="group-stats.html" class="menu-item">
+                    <i class="fas fa-chart-pie menu-icon"></i>
+                    <span class="menu-text">集团统计</span>
+                </a>
+                
+                <div class="menu-section-title">系统管理</div>
+                
+                <a href="user-role.html" class="menu-item">
+                    <i class="fas fa-users-cog menu-icon"></i>
+                    <span class="menu-text">用户角色管理</span>
+                </a>
+                
+                <a href="project-auth.html" class="menu-item">
+                    <i class="fas fa-key menu-icon"></i>
+                    <span class="menu-text">项目授权管理</span>
+                </a>
+                
+                <div class="menu-section-title">辅助支持</div>
+                
+                <a href="function-demo.html" class="menu-item">
+                    <i class="fas fa-play-circle menu-icon"></i>
+                    <span class="menu-text">功能演示入口</span>
+                </a>
+                
+                <a href="training-materials.html" class="menu-item">
+                    <i class="fas fa-book menu-icon"></i>
+                    <span class="menu-text">培训资料</span>
+                </a>
+                
+                <a href="operation-manual.html" class="menu-item">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">操作手册</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="main-content" id="mainContent">
+            <!-- 顶部导航栏 -->
+            <header class="top-nav" id="topNav">
+                <div class="nav-left">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="nav-title">房屋台账</h1>
+                </div>
+                
+                <div class="nav-right">
+                    <div class="nav-item">
+                        <i class="fas fa-bell nav-icon"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-envelope nav-icon"></i>
+                        <span class="notification-badge">2</span>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-cog nav-icon"></i>
+                    </div>
+                    
+                    <div class="user-profile">
+                        <div class="avatar">张</div>
+                        <div class="user-info">
+                            <div class="user-name">张三</div>
+                            <div class="user-role">系统管理员</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- 页面内容 -->
+            <div class="page-content">
+                <div class="page-header">
+                    <h2 class="page-title">房屋台账管理</h2>
+                    <div class="flex gap-3">
+                        <button class="btn btn-primary" id="addBtn">
+                            <i class="fas fa-plus"></i> 新增
+                        </button>
+                        <button class="btn btn-secondary" id="batchDeleteBtn">
+                            <i class="fas fa-trash-alt"></i> 批量删除
+                        </button>
+                        <button class="btn btn-secondary" id="exportBtn">
+                            <i class="fas fa-file-export"></i> 导出
+                        </button>
+                        <button class="btn btn-secondary" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i> 刷新
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 搜索和筛选区域 -->
+                <div class="search-filter-container">
+                    <div class="search-row">
+                        <div class="search-group">
+                            <label for="projectName">项目名称</label>
+                            <select id="projectName" class="search-select">
+                                <option value="">全部项目</option>
+                                <option value="1">京沪高速扩建工程</option>
+                                <option value="2">京港澳高速连接线</option>
+                                <option value="3">京藏高速大修工程</option>
+                                <option value="4">沈海高速服务区扩建</option>
+                                <option value="5">长深高速互通立交</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="section">标段</label>
+                            <select id="section" class="search-select">
+                                <option value="">全部标段</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="village">行政村</label>
+                            <select id="village" class="search-select">
+                                <option value="">全部行政村</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="search-row">
+                        <div class="search-group">
+                            <label for="houseId">房屋编号</label>
+                            <input type="text" id="houseId" class="search-input" placeholder="输入房屋编号">
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="houseOwner">户主姓名</label>
+                            <input type="text" id="houseOwner" class="search-input" placeholder="输入户主姓名">
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="auditStatus">审核状态</label>
+                            <select id="auditStatus" class="search-select">
+                                <option value="">全部状态</option>
+                                <option value="pending">待审核</option>
+                                <option value="approved">已审核</option>
+                                <option value="rejected">已驳回</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button class="btn-reset" id="resetFilter">
+                            <i class="fas fa-redo-alt"></i> 重置
+                        </button>
+                        <button class="btn-filter" id="applyFilter">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 数据卡片区域 -->
+                <div class="data-cards">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-primary">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="card-title">总房屋数量</div>
+                        </div>
+                        <div class="card-value">1,256</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长12%</span>
+                        </div>
+                        <div class="card-unit">栋</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="card-title">已审核房屋</div>
+                        </div>
+                        <div class="card-value">942</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长15%</span>
+                        </div>
+                        <div class="card-unit">栋</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-warning">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="card-title">待审核房屋</div>
+                        </div>
+                        <div class="card-value">314</div>
+                        <div class="card-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>较上月减少5%</span>
+                        </div>
+                        <div class="card-unit">栋</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-info">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                            </div>
+                            <div class="card-title">预计补偿总额</div>
+                        </div>
+                        <div class="card-value">8,752.4</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长8%</span>
+                        </div>
+                        <div class="card-unit">万元</div>
+                    </div>
+                </div>
+                
+                <!-- 表格区域 -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">房屋台账列表</div>
+                        <div class="table-actions">
+                            <button class="table-action-button" id="expandAllBtn">
+                                <i class="fas fa-angle-double-down"></i>
+                                全部展开
+                            </button>
+                            <button class="table-action-button" id="collapseAllBtn">
+                                <i class="fas fa-angle-double-up"></i>
+                                全部折叠
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th width="40">
+                                        <input type="checkbox" class="table-checkbox" id="selectAll">
+                                    </th>
+                                    <th>房屋编号</th>
+                                    <th>户主姓名</th>
+                                    <th>所属项目</th>
+                                    <th>标段</th>
+                                    <th>行政村</th>
+                                    <th>房屋类型</th>
+                                    <th>建筑面积(m²)</th>
+                                    <th>建筑年限</th>
+                                    <th>评估价值(万元)</th>
+                                    <th>测量日期</th>
+                                    <th>审核状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>FWB20230615-001</td>
+                                    <td>张明</td>
+                                    <td>京沪高速扩建工程</td>
+                                    <td>标段1</td>
+                                    <td>大槐树村</td>
+                                    <td>砖瓦房</td>
+                                    <td>256.8</td>
+                                    <td>2008</td>
+                                    <td>82.5</td>
+                                    <td>2023-06-15</td>
+                                    <td>
+                                        <span class="table-badge badge-success">已审核</span>
+                                    </td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action detail" title="详情">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>FWB20230615-002</td>
+                                    <td>李华</td>
+                                    <td>京沪高速扩建工程</td>
+                                    <td>标段1</td>
+                                    <td>大槐树村</td>
+                                    <td>二层小楼</td>
+                                    <td>328.5</td>
+                                    <td>2012</td>
+                                    <td>112.3</td>
+                                    <td>2023-06-15</td>
+                                    <td>
+                                        <span class="table-badge badge-success">已审核</span>
+                                    </td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action detail" title="详情">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>FWB20230610-003</td>
+                                    <td>王芳</td>
+                                    <td>京沪高速扩建工程</td>
+                                    <td>标段1</td>
+                                    <td>柳树村</td>
+                                    <td>砖瓦房</td>
+                                    <td>189.3</td>
+                                    <td>2005</td>
+                                    <td>58.7</td>
+                                    <td>2023-06-10</td>
+                                    <td>
+                                        <span class="table-badge badge-warning">待审核</span>
+                                    </td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action detail" title="详情">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>FWB20230608-004</td>
+                                    <td>赵丽</td>
+                                    <td>京港澳高速连接线</td>
+                                    <td>标段1</td>
+                                    <td>杏花村</td>
+                                    <td>三层小楼</td>
+                                    <td>425.7</td>
+                                    <td>2015</td>
+                                    <td>158.2</td>
+                                    <td>2023-06-08</td>
+                                    <td>
+                                        <span class="table-badge badge-success">已审核</span>
+                                    </td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action detail" title="详情">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>FWB20230605-005</td>
+                                    <td>钱强</td>
+                                    <td>京藏高速大修工程</td>
+                                    <td>标段2</td>
+                                    <td>松树村</td>
+                                    <td>砖瓦房</td>
+                                    <td>210.6</td>
+                                    <td>2003</td>
+                                    <td>68.3</td>
+                                    <td>2023-06-05</td>
+                                    <td>
+                                        <span class="table-badge badge-danger">已驳回</span>
+                                    </td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action detail" title="详情">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>FWB20230603-006</td>
+                                    <td>孙伟</td>
+                                    <td>沈海高速服务区扩建</td>
+                                    <td>标段1</td>
+                                    <td>槐树村</td>
+                                    <td>二层小楼</td>
+                                    <td>295.2</td>
+                                    <td>2010</td>
+                                    <td>98.5</td>
+                                    <td>2023-06-03</td>
+                                    <td>
+                                        <span class="table-badge badge-success">已审核</span>
+                                    </td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action detail" title="详情">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>FWB20230528-007</td>
+                                    <td>周丽</td>
+                                    <td>长深高速互通立交</td>
+                                    <td>标段1</td>
+                                    <td>竹林村</td>
+                                    <td>砖瓦房</td>
+                                    <td>175.8</td>
+                                    <td>1998</td>
+                                    <td>52.3</td>
+                                    <td>2023-05-28</td>
+                                    <td>
+                                        <span class="table-badge badge-warning">待审核</span>
+                                    </td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action edit" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="table-action detail" title="详情">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                        <button class="table-action delete" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 分页区域 -->
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            显示 1-7 条，共 1,256 条
+                        </div>
+                        
+                        <div class="pagination-controls">
+                            <button class="pagination-button" disabled>
+                                <i class="fas fa-angle-left"></i>
+                            </button>
+                            <button class="pagination-button active">1</button>
+                            <button class="pagination-button">2</button>
+                            <button class="pagination-button">3</button>
+                            <button class="pagination-button">4</button>
+                            <button class="pagination-button">5</button>
+                            <button class="pagination-button">
+                                <i class="fas fa-angle-right"></i>
+                            </button>
+                            <select class="pagination-select">
+                                <option value="10">10条/页</option>
+                                <option value="20">20条/页</option>
+                                <option value="50">50条/页</option>
+                                <option value="100">100条/页</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 侧边栏切换功能
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const topNav = document.getElementById('topNav');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            topNav.classList.toggle('expanded');
+            
+            // 更新切换按钮图标
+            if (sidebar.classList.contains('collapsed')) {
+                sidebarToggle.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            } else {
+                sidebarToggle.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            }
+        }
+        
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('expanded');
+        }
+        
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+        
+        // 项目选择联动
+        const projectSelect = document.getElementById('projectName');
+        const sectionSelect = document.getElementById('section');
+        const villageSelect = document.getElementById('village');
+        
+        projectSelect.addEventListener('change', function() {
+            const projectId = this.value;
+            
+            // 清空标段选择
+            sectionSelect.innerHTML = '<option value="">全部标段</option>';
+            villageSelect.innerHTML = '<option value="">全部行政村</option>';
+            
+            if (!projectId) {
+                return;
+            }
+            
+            // 根据选择的项目加载标段数据
+            let sections = [];
+            let villages = [];
+            
+            switch(projectId) {
+                case '1':
+                    sections = [
+                        {id: '1-1', name: '标段1'},
+                        {id: '1-2', name: '标段2'},
+                        {id: '1-3', name: '标段3'}
+                    ];
+                    villages = [
+                        {id: '1-1', name: '大槐树村'},
+                        {id: '1-2', name: '柳树村'},
+                        {id: '1-3', name: '槐树村'}
+                    ];
+                    break;
+                case '2':
+                    sections = [
+                        {id: '2-1', name: '标段1'},
+                        {id: '2-2', name: '标段2'}
+                    ];
+                    villages = [
+                        {id: '2-1', name: '杏花村'},
+                        {id: '2-2', name: '桃花村'}
+                    ];
+                    break;
+                case '3':
+                    sections = [
+                        {id: '3-1', name: '标段1'},
+                        {id: '3-2', name: '标段2'},
+                        {id: '3-3', name: '标段3'},
+                        {id: '3-4', name: '标段4'}
+                    ];
+                    villages = [
+                        {id: '3-1', name: '松树村'},
+                        {id: '3-2', name: '杨树村'},
+                        {id: '3-3', name: '槐树村'},
+                        {id: '3-4', name: '柳树村'}
+                    ];
+                    break;
+                case '4':
+                    sections = [
+                        {id: '4-1', name: '标段1'},
+                        {id: '4-2', name: '标段2'}
+                    ];
+                    villages = [
+                        {id: '4-1', name: '槐树村'},
+                        {id: '4-2', name: '榆树村'}
+                    ];
+                    break;
+                case '5':
+                    sections = [
+                        {id: '5-1', name: '标段1'}
+                    ];
+                    villages = [
+                        {id: '5-1', name: '竹林村'},
+                        {id: '5-2', name: '梅花村'}
+                    ];
+                    break;
+            }
+            
+            // 添加标段选项
+            sections.forEach(section => {
+                const option = document.createElement('option');
+                option.value = section.id;
+                option.textContent = section.name;
+                sectionSelect.appendChild(option);
+            });
+            
+            // 添加行政村选项
+            villages.forEach(village => {
+                const option = document.createElement('option');
+                option.value = village.id;
+                option.textContent = village.name;
+                villageSelect.appendChild(option);
+            });
+        });
+        
+        // 搜索和筛选功能
+        const applyFilter = document.getElementById('applyFilter');
+        const resetFilter = document.getElementById('resetFilter');
+        
+        applyFilter.addEventListener('click', function() {
+            alert('搜索条件已应用，正在加载数据...');
+            // 这里可以添加搜索和筛选的逻辑
+        });
+        
+        resetFilter.addEventListener('click', function() {
+            // 重置所有搜索条件
+            document.getElementById('projectName').value = '';
+            document.getElementById('section').innerHTML = '<option value="">全部标段</option>';
+            document.getElementById('village').innerHTML = '<option value="">全部行政村</option>';
+            document.getElementById('houseId').value = '';
+            document.getElementById('houseOwner').value = '';
+            document.getElementById('auditStatus').value = '';
+        });
+        
+        // 表格操作功能
+        const selectAll = document.getElementById('selectAll');
+        const tableCheckboxes = document.querySelectorAll('.table-checkbox:not(#selectAll)');
+        
+        selectAll.addEventListener('change', function() {
+            const isChecked = this.checked;
+            tableCheckboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+        });
+        
+        // 展开/折叠全部
+        const expandAllBtn = document.getElementById('expandAllBtn');
+        const collapseAllBtn = document.getElementById('collapseAllBtn');
+        
+        expandAllBtn.addEventListener('click', function() {
+            alert('展开全部记录');
+            // 这里可以添加展开全部的逻辑
+        });
+        
+        collapseAllBtn.addEventListener('click', function() {
+            alert('折叠全部记录');
+            // 这里可以添加折叠全部的逻辑
+        });
+        
+        // 表格行操作按钮
+        const tableActionButtons = document.querySelectorAll('.table-action');
+        
+        tableActionButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const actionType = this.classList.contains('view') ? '查看' : 
+                                   this.classList.contains('edit') ? '编辑' : 
+                                   this.classList.contains('detail') ? '详情' : '删除';
+                
+                if (actionType === '删除') {
+                    if (confirm('确定要删除这条记录吗？')) {
+                        alert('记录已删除');
+                    }
+                } else {
+                    alert(`执行${actionType}操作`);
+                }
+            });
+        });
+        
+        // 顶部操作按钮
+        const addBtn = document.getElementById('addBtn');
+        const batchDeleteBtn = document.getElementById('batchDeleteBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        
+        addBtn.addEventListener('click', function() {
+            alert('打开新增房屋记录页面');
+            // 这里可以添加打开新增页面的逻辑
+        });
+        
+        batchDeleteBtn.addEventListener('click', function() {
+            // 检查是否有选中的记录
+            let hasSelected = false;
+            tableCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    hasSelected = true;
+                }
+            });
+            
+            if (hasSelected) {
+                if (confirm('确定要批量删除选中的记录吗？')) {
+                    alert('选中的记录已删除');
+                }
+            } else {
+                alert('请至少选择一条记录');
+            }
+        });
+        
+        exportBtn.addEventListener('click', function() {
+            alert('开始导出数据，请稍候...');
+            // 这里可以添加导出数据的逻辑
+        });
+        
+        refreshBtn.addEventListener('click', function() {
+            // 添加刷新动画
+            this.querySelector('i').classList.add('fa-spin');
+            
+            // 模拟刷新操作
+            setTimeout(() => {
+                this.querySelector('i').classList.remove('fa-spin');
+                alert('数据已刷新');
+            }, 1000);
+        });
+        
+        // 分页控件
+        const paginationButtons = document.querySelectorAll('.pagination-button:not(:disabled)');
+        const paginationSelect = document.querySelector('.pagination-select');
+        
+        paginationButtons.forEach(button => {
+            if (!button.classList.contains('active')) {
+                button.addEventListener('click', function() {
+                    // 移除所有活动状态
+                    document.querySelectorAll('.pagination-button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    // 添加当前活动状态
+                    this.classList.add('active');
+                    
+                    // 如果是上一页或下一页按钮
+                    if (this.querySelector('i')) {
+                        // 这里可以添加翻页逻辑
+                        alert('切换到下一页数据');
+                    }
+                });
+            }
+        });
+        
+        paginationSelect.addEventListener('change', function() {
+            const pageSize = this.value;
+            alert(`每页显示${pageSize}条数据`);
+            // 这里可以添加改变每页显示数量的逻辑
+        });
+        
+        // 响应式处理
+        function handleResize() {
+            const width = window.innerWidth;
+            
+            // 在移动设备上默认收起侧边栏
+            if (width < 768) {
+                sidebar.classList.remove('expanded');
+            } else {
+                sidebar.classList.add('expanded');
+            }
+        }
+        
+        // 初始化响应式处理
+        handleResize();
+        // 监听窗口大小变化
+        window.addEventListener('resize', handleResize);
+    </script>
+</body>
+</html>

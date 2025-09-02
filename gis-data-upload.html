@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高速公路征地拆迁管理系统 - 测绘数据上传</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 测绘数据上传特定样式 */
+        .data-upload-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 文件上传区域样式 */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            background-color: var(--bg-light);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            margin-bottom: 24px;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            background-color: rgba(22, 93, 255, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: var(--info);
+            margin-bottom: 16px;
+        }
+        
+        .upload-text {
+            font-size: 16px;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .upload-subtext {
+            font-size: 14px;
+            color: var(--info);
+        }
+        
+        .upload-button {
+            margin-top: 16px;
+            padding: 8px 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .upload-button:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        /* 文件列表样式 */
+        .file-list {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .file-list-header {
+            padding: 16px 20px;
+            background-color: var(--bg-light);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            transition: background-color 0.2s ease;
+        }
+        
+        .file-item:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-icon {
+            font-size: 24px;
+            color: var(--primary);
+            margin-right: 16px;
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+        
+        .file-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--info);
+        }
+        
+        .file-size {
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-date {
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background-color: rgba(0, 180, 42, 0.1);
+            color: var(--success);
+        }
+        
+        .status-pending {
+            background-color: rgba(255, 125, 0, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-error {
+            background-color: rgba(245, 63, 63, 0.1);
+            color: var(--danger);
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .file-action-button {
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .file-action-button:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* 数据类型选择器样式 */
+        .data-type-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .data-type-item {
+            padding: 12px 20px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: white;
+        }
+        
+        .data-type-item:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .data-type-item.active {
+            border-color: var(--primary);
+            background-color: rgba(22, 93, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        .type-icon {
+            font-size: 18px;
+        }
+        
+        .type-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* 进度条样式 */
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background-color: var(--bg-light);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        /* 数据验证和分析结果样式 */
+        .analysis-results {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-top: 24px;
+        }
+        
+        .analysis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .analysis-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .validation-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .validation-item:last-child {
+            border-bottom: none;
+        }
+        
+        .validation-icon {
+            font-size: 20px;
+        }
+        
+        .validation-success {
+            color: var(--success);
+        }
+        
+        .validation-warning {
+            color: var(--warning);
+        }
+        
+        .validation-error {
+            color: var(--danger);
+        }
+        
+        .validation-content {
+            flex: 1;
+        }
+        
+        .validation-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+        
+        .validation-message {
+            font-size: 12px;
+            color: var(--info);
+        }
+        
+        /* 响应式样式 */
+        @media (max-width: 768px) {
+            .data-type-selector {
+                flex-direction: column;
+            }
+            
+            .file-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .file-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="data-upload-container">
+        <!-- 侧边栏导航 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-road logo-icon"></i>
+                    <span class="logo-text">征拆管理系统</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <div class="menu-section-title">主导航</div>
+                
+                <a href="dashboard.html" class="menu-item">
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">仪表盘</span>
+                </a>
+                
+                <div class="menu-section-title">GIS数据管理</div>
+                
+                <a href="gis-data-upload.html" class="menu-item active">
+                    <i class="fas fa-upload menu-icon"></i>
+                    <span class="menu-text">测绘数据上传</span>
+                </a>
+                
+                <a href="gis-publish.html" class="menu-item">
+                    <i class="fas fa-map-marked-alt menu-icon"></i>
+                    <span class="menu-text">GIS发布</span>
+                </a>
+                
+                <div class="menu-section-title">台账管理</div>
+                
+                <a href="gis-ledger.html" class="menu-item">
+                    <i class="fas fa-database menu-icon"></i>
+                    <span class="menu-text">GIS台账</span>
+                </a>
+                
+                <a href="land-ledger.html" class="menu-item">
+                    <i class="fas fa-paragraph menu-icon"></i>
+                    <span class="menu-text">征地台账</span>
+                </a>
+                
+                <a href="house-ledger.html" class="menu-item">
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">房屋台账</span>
+                </a>
+                
+                <a href="attachment-ledger.html" class="menu-item">
+                    <i class="fas fa-paperclip menu-icon"></i>
+                    <span class="menu-text">附着物台账</span>
+                </a>
+                
+                <a href="audit-ledger.html" class="menu-item">
+                    <i class="fas fa-search menu-icon"></i>
+                    <span class="menu-text">审核台账</span>
+                </a>
+                
+                <a href="agreement-ledger.html" class="menu-item">
+                    <i class="fas fa-file-contract menu-icon"></i>
+                    <span class="menu-text">协议台账</span>
+                </a>
+                
+                <a href="settlement-ledger.html" class="menu-item">
+                    <i class="fas fa-money-bill-wave menu-icon"></i>
+                    <span class="menu-text">结算台账</span>
+                    <span class="menu-badge">5</span>
+                </a>
+                
+                <div class="menu-section-title">基础配置管理</div>
+                
+                <a href="form-template.html" class="menu-item">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">表单协议模板管理</span>
+                </a>
+                
+                <a href="process-config.html" class="menu-item">
+                    <i class="fas fa-sitemap menu-icon"></i>
+                    <span class="menu-text">流程配置</span>
+                </a>
+                
+                <a href="compensation-standard.html" class="menu-item">
+                    <i class="fas fa-list-ol menu-icon"></i>
+                    <span class="menu-text">区域补偿标准库</span>
+                </a>
+                
+                <div class="menu-section-title">统计分析</div>
+                
+                <a href="demolition-stats.html" class="menu-item">
+                    <i class="fas fa-chart-bar menu-icon"></i>
+                    <span class="menu-text">征拆区域统计</span>
+                </a>
+                
+                <a href="project-stats.html" class="menu-item">
+                    <i class="fas fa-chart-line menu-icon"></i>
+                    <span class="menu-text">项目统计</span>
+                </a>
+                
+                <a href="group-stats.html" class="menu-item">
+                    <i class="fas fa-chart-pie menu-icon"></i>
+                    <span class="menu-text">集团统计</span>
+                </a>
+                
+                <div class="menu-section-title">系统管理</div>
+                
+                <a href="user-role.html" class="menu-item">
+                    <i class="fas fa-users-cog menu-icon"></i>
+                    <span class="menu-text">用户角色管理</span>
+                </a>
+                
+                <a href="project-auth.html" class="menu-item">
+                    <i class="fas fa-key menu-icon"></i>
+                    <span class="menu-text">项目授权管理</span>
+                </a>
+                
+                <div class="menu-section-title">辅助支持</div>
+                
+                <a href="function-demo.html" class="menu-item">
+                    <i class="fas fa-play-circle menu-icon"></i>
+                    <span class="menu-text">功能演示入口</span>
+                </a>
+                
+                <a href="training-materials.html" class="menu-item">
+                    <i class="fas fa-book menu-icon"></i>
+                    <span class="menu-text">培训资料</span>
+                </a>
+                
+                <a href="operation-manual.html" class="menu-item">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">操作手册</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="main-content" id="mainContent">
+            <!-- 顶部导航栏 -->
+            <header class="top-nav" id="topNav">
+                <div class="nav-left">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="nav-title">测绘数据上传</h1>
+                </div>
+                
+                <div class="nav-right">
+                    <div class="nav-item">
+                        <i class="fas fa-bell nav-icon"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-envelope nav-icon"></i>
+                        <span class="notification-badge">2</span>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-cog nav-icon"></i>
+                    </div>
+                    
+                    <div class="user-profile">
+                        <div class="avatar">张</div>
+                        <div class="user-info">
+                            <div class="user-name">张三</div>
+                            <div class="user-role">系统管理员</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- 页面内容 -->
+            <div class="page-content">
+                <div class="page-header">
+                    <h2 class="page-title">GIS测绘数据上传</h2>
+                    <div class="flex gap-3">
+                        <button class="btn btn-primary" id="batchUploadBtn">
+                            <i class="fas fa-upload"></i> 批量上传
+                        </button>
+                        <button class="btn btn-secondary" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i> 刷新
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 项目选择 -->
+                <div class="card mb-24px">
+                    <div class="card-title">
+                        <i class="fas fa-project-diagram"></i> 选择项目
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group col-lg-6">
+                                <label for="projectSelect">项目名称</label>
+                                <select id="projectSelect" class="form-control">
+                                    <option value="">请选择项目</option>
+                                    <option value="1">京沪高速扩建工程</option>
+                                    <option value="2">京港澳高速连接线</option>
+                                    <option value="3">京藏高速大修工程</option>
+                                    <option value="4">沈海高速服务区扩建</option>
+                                    <option value="5">长深高速互通立交</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-lg-6">
+                                <label for="sectionSelect">标段</label>
+                                <select id="sectionSelect" class="form-control">
+                                    <option value="">请先选择项目</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 数据类型选择 -->
+                <div class="card mb-24px">
+                    <div class="card-title">
+                        <i class="fas fa-file-import"></i> 选择数据类型
+                    </div>
+                    <div class="card-body">
+                        <div class="data-type-selector">
+                            <div class="data-type-item active" data-type="cad">
+                                <i class="fas fa-cad type-icon"></i>
+                                <span class="type-name">CAD图纸</span>
+                            </div>
+                            <div class="data-type-item" data-type="shape">
+                                <i class="fas fa-shapes type-icon"></i>
+                                <span class="type-name">Shapefile</span>
+                            </div>
+                            <div class="data-type-item" data-type="raster">
+                                <i class="fas fa-image type-icon"></i>
+                                <span class="type-name">栅格影像</span>
+                            </div>
+                            <div class="data-type-item" data-type="dem">
+                                <i class="fas fa-mountain type-icon"></i>
+                                <span class="type-name">DEM数据</span>
+                            </div>
+                            <div class="data-type-item" data-type="gps">
+                                <i class="fas fa-map-marker-alt type-icon"></i>
+                                <span class="type-name">GPS测量数据</span>
+                            </div>
+                            <div class="data-type-item" data-type="other">
+                                <i class="fas fa-file type-icon"></i>
+                                <span class="type-name">其他数据</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 文件上传区域 -->
+                <div class="card mb-24px">
+                    <div class="card-title">
+                        <i class="fas fa-cloud-upload-alt"></i> 文件上传
+                    </div>
+                    <div class="card-body">
+                        <div class="upload-area" id="uploadArea">
+                            <input type="file" id="fileInput" class="hidden" multiple>
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <div class="upload-text">拖拽文件到此处或点击上传</div>
+                            <div class="upload-subtext">支持 .dwg, .dxf, .shp, .tif, .jpg, .png, .las, .xyz 等格式</div>
+                            <button class="upload-button" id="browseBtn">浏览文件</button>
+                        </div>
+                        
+                        <!-- 上传设置 -->
+                        <div class="upload-settings">
+                            <div class="form-row">
+                                <div class="form-group col-lg-4">
+                                    <label for="coordinateSystem">坐标系</label>
+                                    <select id="coordinateSystem" class="form-control">
+                                        <option value="wgs84">WGS84</option>
+                                        <option value="gcj02">GCJ02 (火星坐标系)</option>
+                                        <option value="bd09" selected>BD09 (百度坐标系)</option>
+                                        <option value="cgcs2000">CGCS2000 (国家大地坐标系)</option>
+                                        <option value="local">地方坐标系</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-lg-4">
+                                    <label for="dataAccuracy">数据精度</label>
+                                    <select id="dataAccuracy" class="form-control">
+                                        <option value="high">高精度 (厘米级)</option>
+                                        <option value="medium" selected>中等精度 (米级)</option>
+                                        <option value="low">低精度 (十米级)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-lg-4">
+                                    <label for="dataSource">数据来源</label>
+                                    <select id="dataSource" class="form-control">
+                                        <option value="field" selected>实地测量</option>
+                                        <option value="satellite">卫星影像</option>
+                                        <option value="aerial">航空摄影</option>
+                                        <option value="other">其他</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 上传文件列表 -->
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-file-list"></i> 上传文件列表
+                    </div>
+                    <div class="card-body">
+                        <div class="file-list">
+                            <div class="file-list-header">
+                                <div class="flex items-center justify-between">
+                                    <span>文件信息</span>
+                                    <div class="flex gap-16px">
+                                        <span>大小</span>
+                                        <span>上传日期</span>
+                                        <span>状态</span>
+                                        <span>操作</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 上传完成文件 -->
+                            <div class="file-item">
+                                <i class="fas fa-file-cad file-icon"></i>
+                                <div class="file-info">
+                                    <div class="file-name">京沪高速标段1设计图纸.dwg</div>
+                                    <div class="file-meta">
+                                        <div class="file-size">
+                                            <i class="fas fa-weight-hanging mr-1"></i> 12.5 MB
+                                        </div>
+                                        <div class="file-date">
+                                            <i class="far fa-calendar-alt mr-1"></i> 2023-06-15 14:30
+                                        </div>
+                                        <div class="file-status">
+                                            <span class="status-badge status-success">已完成</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-button" title="查看">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="file-action-button" title="下载">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <button class="file-action-button" title="删除">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 上传中文件 -->
+                            <div class="file-item">
+                                <i class="fas fa-file-image file-icon"></i>
+                                <div class="file-info">
+                                    <div class="file-name">京沪高速航拍影像.tif</div>
+                                    <div class="file-meta">
+                                        <div class="file-size">
+                                            <i class="fas fa-weight-hanging mr-1"></i> 48.7 MB
+                                        </div>
+                                        <div class="file-date">
+                                            <i class="far fa-calendar-alt mr-1"></i> 2023-06-15 15:12
+                                        </div>
+                                        <div class="file-status">
+                                            <span class="status-badge status-pending">上传中 65%</span>
+                                        </div>
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 65%;"></div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-button" title="暂停">
+                                        <i class="fas fa-pause"></i>
+                                    </button>
+                                    <button class="file-action-button" title="取消">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 上传失败文件 -->
+                            <div class="file-item">
+                                <i class="fas fa-file-shape file-icon"></i>
+                                <div class="file-info">
+                                    <div class="file-name">京沪高速地形数据.shp</div>
+                                    <div class="file-meta">
+                                        <div class="file-size">
+                                            <i class="fas fa-weight-hanging mr-1"></i> 8.3 MB
+                                        </div>
+                                        <div class="file-date">
+                                            <i class="far fa-calendar-alt mr-1"></i> 2023-06-15 10:45
+                                        </div>
+                                        <div class="file-status">
+                                            <span class="status-badge status-error">上传失败</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-button" title="重新上传">
+                                        <i class="fas fa-redo"></i>
+                                    </button>
+                                    <button class="file-action-button" title="查看错误">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                    </button>
+                                    <button class="file-action-button" title="删除">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 数据验证和分析结果 -->
+                <div class="analysis-results">
+                    <div class="analysis-header">
+                        <h3 class="analysis-title">
+                            <i class="fas fa-check-circle"></i> 数据验证和分析结果
+                        </h3>
+                        <button class="btn btn-sm btn-primary" id="analyzeBtn">
+                            <i class="fas fa-analytics"></i> 重新分析
+                        </button>
+                    </div>
+                    
+                    <div class="validation-items">
+                        <div class="validation-item">
+                            <i class="fas fa-check-circle validation-icon validation-success"></i>
+                            <div class="validation-content">
+                                <div class="validation-title">文件格式验证</div>
+                                <div class="validation-message">所有上传的文件格式均符合系统要求</div>
+                            </div>
+                        </div>
+                        
+                        <div class="validation-item">
+                            <i class="fas fa-exclamation-triangle validation-icon validation-warning"></i>
+                            <div class="validation-content">
+                                <div class="validation-title">坐标系一致性</div>
+                                <div class="validation-message">部分文件坐标系与项目默认坐标系不一致，建议统一坐标系</div>
+                            </div>
+                        </div>
+                        
+                        <div class="validation-item">
+                            <i class="fas fa-check-circle validation-icon validation-success"></i>
+                            <div class="validation-content">
+                                <div class="validation-title">数据完整性</div>
+                                <div class="validation-message">所有必要的文件组件都已上传</div>
+                            </div>
+                        </div>
+                        
+                        <div class="validation-item">
+                            <i class="fas fa-exclamation-circle validation-icon validation-error"></i>
+                            <div class="validation-content">
+                                <div class="validation-title">空间参考信息</div>
+                                <div class="validation-message">京沪高速地形数据.shp文件缺少空间参考信息，需要补充</div>
+                            </div>
+                        </div>
+                        
+                        <div class="validation-item">
+                            <i class="fas fa-check-circle validation-icon validation-success"></i>
+                            <div class="validation-content">
+                                <div class="validation-title">文件大小检查</div>
+                                <div class="validation-message">所有文件大小均在系统限制范围内</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 侧边栏切换功能
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const topNav = document.getElementById('topNav');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            topNav.classList.toggle('expanded');
+            
+            // 更新切换按钮图标
+            if (sidebar.classList.contains('collapsed')) {
+                sidebarToggle.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            } else {
+                sidebarToggle.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            }
+        }
+        
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('expanded');
+        }
+        
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+        
+        // 项目选择联动
+        const projectSelect = document.getElementById('projectSelect');
+        const sectionSelect = document.getElementById('sectionSelect');
+        
+        projectSelect.addEventListener('change', function() {
+            const projectId = this.value;
+            
+            // 清空标段选择
+            sectionSelect.innerHTML = '';
+            
+            if (!projectId) {
+                sectionSelect.innerHTML = '<option value="">请先选择项目</option>';
+                return;
+            }
+            
+            // 根据选择的项目加载标段数据
+            let sections = [];
+            
+            switch(projectId) {
+                case '1':
+                    sections = [
+                        {id: '1-1', name: '京沪高速扩建工程 - 标段1'},
+                        {id: '1-2', name: '京沪高速扩建工程 - 标段2'},
+                        {id: '1-3', name: '京沪高速扩建工程 - 标段3'}
+                    ];
+                    break;
+                case '2':
+                    sections = [
+                        {id: '2-1', name: '京港澳高速连接线 - 标段1'},
+                        {id: '2-2', name: '京港澳高速连接线 - 标段2'}
+                    ];
+                    break;
+                case '3':
+                    sections = [
+                        {id: '3-1', name: '京藏高速大修工程 - 标段1'},
+                        {id: '3-2', name: '京藏高速大修工程 - 标段2'},
+                        {id: '3-3', name: '京藏高速大修工程 - 标段3'},
+                        {id: '3-4', name: '京藏高速大修工程 - 标段4'}
+                    ];
+                    break;
+                case '4':
+                    sections = [
+                        {id: '4-1', name: '沈海高速服务区扩建 - 标段1'},
+                        {id: '4-2', name: '沈海高速服务区扩建 - 标段2'}
+                    ];
+                    break;
+                case '5':
+                    sections = [
+                        {id: '5-1', name: '长深高速互通立交 - 标段1'}
+                    ];
+                    break;
+            }
+            
+            // 添加选项
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = '请选择标段';
+            sectionSelect.appendChild(defaultOption);
+            
+            sections.forEach(section => {
+                const option = document.createElement('option');
+                option.value = section.id;
+                option.textContent = section.name;
+                sectionSelect.appendChild(option);
+            });
+        });
+        
+        // 数据类型选择
+        const dataTypeItems = document.querySelectorAll('.data-type-item');
+        
+        dataTypeItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // 移除所有活动状态
+                dataTypeItems.forEach(i => i.classList.remove('active'));
+                // 添加当前活动状态
+                this.classList.add('active');
+            });
+        });
+        
+        // 文件上传功能
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const browseBtn = document.getElementById('browseBtn');
+        const batchUploadBtn = document.getElementById('batchUploadBtn');
+        
+        // 点击上传区域触发文件选择
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        // 点击浏览按钮触发文件选择
+        browseBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            fileInput.click();
+        });
+        
+        // 批量上传按钮
+        batchUploadBtn.addEventListener('click', function() {
+            alert('批量上传功能将在后续版本中实现');
+        });
+        
+        // 文件选择后处理
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                // 这里可以添加文件上传的逻辑
+                alert(`已选择 ${this.files.length} 个文件准备上传`);
+                // 模拟文件上传
+                simulateUpload();
+            }
+        });
+        
+        // 拖拽上传功能
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('hover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function() {
+            this.classList.remove('hover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('hover');
+            
+            if (e.dataTransfer.files.length > 0) {
+                // 这里可以添加文件上传的逻辑
+                alert(`已拖拽 ${e.dataTransfer.files.length} 个文件准备上传`);
+                // 模拟文件上传
+                simulateUpload();
+            }
+        });
+        
+        // 模拟文件上传进度
+        function simulateUpload() {
+            const progressBar = document.querySelector('.progress-bar');
+            const statusBadge = document.querySelector('.status-badge.status-pending');
+            let progress = 0;
+            
+            const interval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = `${progress}%`;
+                statusBadge.textContent = `上传中 ${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    statusBadge.textContent = '已完成';
+                    statusBadge.classList.remove('status-pending');
+                    statusBadge.classList.add('status-success');
+                }
+            }, 300);
+        }
+        
+        // 刷新按钮
+        const refreshBtn = document.getElementById('refreshBtn');
+        
+        refreshBtn.addEventListener('click', function() {
+            // 添加刷新动画
+            this.querySelector('i').classList.add('fa-spin');
+            
+            // 模拟刷新操作
+            setTimeout(() => {
+                this.querySelector('i').classList.remove('fa-spin');
+                alert('文件列表已刷新');
+            }, 1000);
+        });
+        
+        // 重新分析按钮
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        
+        analyzeBtn.addEventListener('click', function() {
+            // 添加分析动画
+            this.querySelector('i').classList.add('fa-spin');
+            
+            // 模拟分析操作
+            setTimeout(() => {
+                this.querySelector('i').classList.remove('fa-spin');
+                alert('数据重新分析完成');
+            }, 1500);
+        });
+        
+        // 文件操作按钮事件处理
+        const fileActionButtons = document.querySelectorAll('.file-action-button');
+        
+        fileActionButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                let action = '';
+                
+                if (icon.classList.contains('fa-eye')) {
+                    action = '查看';
+                } else if (icon.classList.contains('fa-download')) {
+                    action = '下载';
+                } else if (icon.classList.contains('fa-trash')) {
+                    action = '删除';
+                } else if (icon.classList.contains('fa-pause')) {
+                    action = '暂停';
+                } else if (icon.classList.contains('fa-times')) {
+                    action = '取消';
+                } else if (icon.classList.contains('fa-redo')) {
+                    action = '重新上传';
+                } else if (icon.classList.contains('fa-exclamation-circle')) {
+                    action = '查看错误';
+                }
+                
+                alert(`执行${action}操作`);
+            });
+        });
+    </script>
+</body>
+</html>

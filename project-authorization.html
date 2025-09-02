@@ -1,0 +1,2592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目授权管理 - 高速公路征地拆迁管理系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 基础样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 220px;
+            height: 100vh;
+            background-color: #1f2937;
+            color: #e5e7eb;
+            position: fixed;
+            left: 0;
+            top: 0;
+            transition: width 0.3s ease;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        
+        .sidebar.collapsed {
+            width: 60px;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #374151;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .sidebar-header .logo {
+            font-size: 18px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .sidebar-header .logo-icon {
+            width: 32px;
+            height: 32px;
+            background-color: #3b82f6;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+        
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: #e5e7eb;
+            cursor: pointer;
+            font-size: 16px;
+            display: none;
+        }
+        
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+        
+        .nav-section {
+            margin-bottom: 20px;
+        }
+        
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .nav-item {
+            margin-bottom: 2px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #e5e7eb;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        
+        .nav-link:hover {
+            background-color: #374151;
+        }
+        
+        .nav-link.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .nav-link-icon {
+            font-size: 16px;
+            margin-right: 12px;
+            min-width: 20px;
+            text-align: center;
+        }
+        
+        .nav-link-text {
+            font-size: 14px;
+        }
+        
+        /* 主内容区域样式 */
+        .main-content {
+            margin-left: 220px;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content.expanded {
+            margin-left: 60px;
+        }
+        
+        /* 顶部导航栏 */
+        .top-nav {
+            height: 60px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: fixed;
+            top: 0;
+            left: 220px;
+            right: 0;
+            transition: left 0.3s ease;
+            z-index: 999;
+        }
+        
+        .top-nav.expanded {
+            left: 60px;
+        }
+        
+        .mobile-menu-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #333;
+            display: none;
+        }
+        
+        .top-nav-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .top-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .top-nav-item {
+            position: relative;
+        }
+        
+        .top-nav-button {
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: #666;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .top-nav-button:hover {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .top-nav-button.notification {
+            position: relative;
+        }
+        
+        .top-nav-button.notification::after {
+            content: '3';
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 16px;
+            height: 16px;
+            background-color: #ef4444;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .user-role {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        /* 页面内容区域 */
+        .page-content {
+            flex: 1;
+            padding: 24px;
+            margin-top: 60px;
+        }
+        
+        .page-header {
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .breadcrumb-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .breadcrumb-item:not(:last-child)::after {
+            content: '>';
+            margin-left: 8px;
+            color: #ccc;
+        }
+        
+        .breadcrumb-link {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        
+        .breadcrumb-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* 统计卡片区域 */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .stat-icon.blue {
+            background-color: #3b82f6;
+        }
+        
+        .stat-icon.green {
+            background-color: #10b981;
+        }
+        
+        .stat-icon.purple {
+            background-color: #8b5cf6;
+        }
+        
+        .stat-icon.orange {
+            background-color: #f97316;
+        }
+        
+        .stat-content {
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        /* 工具栏 */
+        .toolbar {
+            background-color: white;
+            border-radius: 8px;
+            padding: 16px 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            text-decoration: none;
+            gap: 6px;
+        }
+        
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        
+        .btn-primary:disabled {
+            background-color: #93c5fd;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+        }
+        
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+        }
+        
+        .btn-outline:hover {
+            background-color: #f0f9ff;
+        }
+        
+        /* 搜索和筛选 */
+        .search-filter {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 200px;
+            padding: 8px 12px 8px 36px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 14px;
+        }
+        
+        .select-box {
+            position: relative;
+        }
+        
+        .select {
+            width: 150px;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: white;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+        
+        .select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* 筛选面板 */
+        .filter-panel {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+        
+        .filter-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1f2937;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .filter-toggle {
+            background: none;
+            border: none;
+            color: #3b82f6;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .filter-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .filter-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .filter-input, .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+        }
+        
+        .filter-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+        
+        /* 授权管理区域 */
+        .authorization-section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+        
+        .authorization-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .authorization-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .authorization-content {
+            padding: 20px;
+        }
+        
+        /* 项目选择器 */
+        .project-selector {
+            margin-bottom: 24px;
+        }
+        
+        .project-selector-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 12px;
+        }
+        
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .project-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            background-color: #e0e7ff;
+            color: #3b82f6;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        
+        .project-tag:hover {
+            background-color: #dbeafe;
+        }
+        
+        .project-tag.active {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #2563eb;
+        }
+        
+        .project-tag .tag-remove {
+            margin-left: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 用户列表和授权表格 */
+        .authorization-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 24px;
+        }
+        
+        .user-list-container {
+            background-color: #f9fafb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .user-list-header {
+            padding: 16px;
+            background-color: #f3f4f6;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-list-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .user-list-search {
+            position: relative;
+        }
+        
+        .user-list-input {
+            width: 100%;
+            padding: 6px 12px 6px 32px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        
+        .user-list-icon {
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 12px;
+        }
+        
+        .user-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .user-item:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .user-item.active {
+            background-color: #dbeafe;
+        }
+        
+        .user-item-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 12px;
+        }
+        
+        .user-item-info {
+            flex: 1;
+        }
+        
+        .user-item-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #1f2937;
+            margin-bottom: 2px;
+        }
+        
+        .user-item-role {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .user-item-checkbox {
+            margin-left: 8px;
+        }
+        
+        /* 授权表格 */
+        .authorization-table-container {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .table-header {
+            padding: 16px;
+            background-color: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table {}
+        
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        
+        .table-content {
+            min-width: 800px;
+        }
+        
+        .table-row {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .table-row.header {
+            background-color: #f9fafb;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .table-row:hover {
+            background-color: #f9fafb;
+        }
+        
+        .table-cell {
+            padding: 12px 16px;
+            flex: 1;
+            font-size: 14px;
+            color: #4b5563;
+        }
+        
+        .table-cell.header {
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .table-cell.wider {
+            flex: 2;
+        }
+        
+        .table-cell.narrow {
+            flex: 0.5;
+            min-width: 100px;
+        }
+        
+        /* 权限控制 */
+        .permission-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .permission-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        .permission-checkbox input[type="checkbox"] {
+            cursor: pointer;
+        }
+        
+        /* 授权历史记录 */
+        .authorization-history {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+        
+        .history-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .history-content {
+            padding: 20px;
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .history-table th,
+        .history-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+        
+        .history-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .history-table tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        /* 分页控件 */
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        
+        .pagination-info {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .pagination-button {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #d1d5db;
+            background-color: white;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .pagination-button:hover:not(:disabled) {
+            background-color: #f3f4f6;
+            border-color: #9ca3af;
+        }
+        
+        .pagination-button.active {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-select {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: white;
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        /* 表单样式 */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        /* 确认对话框 */
+        .confirm-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .confirm-dialog.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .confirm-dialog-content {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .confirm-dialog-header {
+            padding: 24px 24px 0;
+        }
+        
+        .confirm-dialog-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto;
+            background-color: #fef3c7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #d97706;
+        }
+        
+        .confirm-dialog-message {
+            padding: 24px;
+            font-size: 16px;
+            color: #374151;
+            line-height: 1.5;
+        }
+        
+        .confirm-dialog-footer {
+            padding: 0 24px 24px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .authorization-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-list-container {
+                max-height: 300px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 220px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .top-nav {
+                left: 0;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .sidebar-toggle {
+                display: block;
+            }
+            
+            .stats-cards {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .filter-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-content {
+                min-width: 600px;
+            }
+            
+            .pagination {
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .page-content {
+                padding: 16px;
+            }
+            
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .toolbar-left, .toolbar-right {
+                justify-content: stretch;
+            }
+            
+            .search-input {
+                width: 100%;
+            }
+            
+            .select {
+                width: 100%;
+            }
+            
+            .table-content {
+                min-width: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏导航 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-icon">
+                <i class="fas fa-road"></i>
+            </div>
+            <div class="logo">征拆管理系统</div>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">系统管理</div>
+                <div class="nav-item">
+                    <a href="user-role.html" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-users"></i></div>
+                        <div class="nav-link-text">用户角色管理</div>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="project-authorization.html" class="nav-link active">
+                        <div class="nav-link-icon"><i class="fas fa-key"></i></div>
+                        <div class="nav-link-text">项目授权管理</div>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">GIS数据管理</div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-upload"></i></div>
+                        <div class="nav-link-text">测绘数据上传</div>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-map-marked-alt"></i></div>
+                        <div class="nav-link-text">GIS发布</div>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">台账管理</div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-database"></i></div>
+                        <div class="nav-link-text">GIS台账</div>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="land-ledger.html" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-landmark"></i></div>
+                        <div class="nav-link-text">征地台账</div>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="house-ledger.html" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-home"></i></div>
+                        <div class="nav-link-text">房屋台账</div>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="attachment-ledger.html" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-tools"></i></div>
+                        <div class="nav-link-text">附着物台账</div>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="audit-ledger.html" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="nav-link-text">审核台账</div>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="agreement-ledger.html" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-file-signature"></i></div>
+                        <div class="nav-link-text">协议台账</div>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="settlement-ledger.html" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                        <div class="nav-link-text">结算台账</div>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">基础配置管理</div>
+                <div class="nav-item">
+                    <a href="form-template.html" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-file-alt"></i></div>
+                        <div class="nav-link-text">表单协议模板管理</div>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="process-config.html" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-project-diagram"></i></div>
+                        <div class="nav-link-text">流程配置</div>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="compensation-standard.html" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-tag"></i></div>
+                        <div class="nav-link-text">区域补偿标准库</div>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">统计分析</div>
+                <div class="nav-item">
+                    <a href="demolition-stats.html" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-chart-pie"></i></div>
+                        <div class="nav-link-text">征拆区域统计</div>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="project-stats.html" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="nav-link-text">项目统计</div>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="group-stats.html" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-chart-bar"></i></div>
+                        <div class="nav-link-text">集团统计</div>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">辅助支持管理</div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-play-circle"></i></div>
+                        <div class="nav-link-text">功能演示入口</div>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-book"></i></div>
+                        <div class="nav-link-text">培训资料</div>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        <div class="nav-link-icon"><i class="fas fa-book-open"></i></div>
+                        <div class="nav-link-text">操作手册</div>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </aside>
+    
+    <!-- 主内容区域 -->
+    <main class="main-content" id="mainContent">
+        <!-- 顶部导航栏 -->
+        <header class="top-nav" id="topNav">
+            <div class="top-nav-left">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">项目授权管理</h1>
+            </div>
+            
+            <div class="top-nav-right">
+                <div class="top-nav-item">
+                    <button class="top-nav-button notification">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                </div>
+                <div class="top-nav-item">
+                    <button class="top-nav-button">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">张管理员</div>
+                        <div class="user-role">系统管理员</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- 页面内容 -->
+        <div class="page-content">
+            <!-- 面包屑导航 -->
+            <div class="breadcrumb">
+                <div class="breadcrumb-item">
+                    <a href="#" class="breadcrumb-link">首页</a>
+                </div>
+                <div class="breadcrumb-item">
+                    <a href="#" class="breadcrumb-link">系统管理</a>
+                </div>
+                <div class="breadcrumb-item">
+                    项目授权管理
+                </div>
+            </div>
+            
+            <!-- 统计卡片区域 -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">总项目数</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">48</div>
+                        <div class="stat-label">授权用户数</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">216</div>
+                        <div class="stat-label">总授权数</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">36</div>
+                        <div class="stat-label">本月授权变动</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 筛选面板 -->
+            <div class="filter-panel">
+                <div class="filter-title">
+                    <span>筛选条件</span>
+                    <button class="filter-toggle">
+                        <i class="fas fa-chevron-up"></i>
+                    </button>
+                </div>
+                
+                <div class="filter-content">
+                    <div class="filter-group">
+                        <label class="filter-label">项目名称</label>
+                        <input type="text" class="filter-input" placeholder="请输入项目名称">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">授权状态</label>
+                        <select class="filter-select">
+                            <option value="">全部状态</option>
+                            <option value="active">已授权</option>
+                            <option value="expired">已过期</option>
+                            <option value="pending">待授权</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">用户角色</label>
+                        <select class="filter-select">
+                            <option value="">全部角色</option>
+                            <option value="admin">系统管理员</option>
+                            <option value="projectManager">项目经理</option>
+                            <option value="demolitionOfficer">征拆专员</option>
+                            <option value="financialOfficer">财务专员</option>
+                            <option value="auditor">审核员</option>
+                            <option value="viewer">查看员</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">变动时间</label>
+                        <input type="date" class="filter-input">
+                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <button class="btn btn-secondary" id="resetFilter">重置</button>
+                    <button class="btn btn-primary" id="applyFilter">应用筛选</button>
+                </div>
+            </div>
+            
+            <!-- 授权管理区域 -->
+            <div class="authorization-section">
+                <div class="authorization-header">
+                    <h2 class="authorization-title">项目授权管理</h2>
+                    <div class="authorization-actions">
+                        <button class="btn btn-primary" id="batchAuthorizationBtn">
+                            <i class="fas fa-key"></i>
+                            批量授权
+                        </button>
+                        <button class="btn btn-outline" id="exportAuthorizationBtn">
+                            <i class="fas fa-file-export"></i>
+                            导出授权
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="authorization-content">
+                    <!-- 项目选择器 -->
+                    <div class="project-selector">
+                        <div class="project-selector-title">选择项目</div>
+                        <div class="project-tags">
+                            <div class="project-tag active" data-project-id="all">
+                                全部项目
+                                <span class="tag-remove">
+                                    <i class="fas fa-times"></i>
+                                </span>
+                            </div>
+                            <div class="project-tag" data-project-id="proj001">
+                                京沪高速公路扩建工程
+                                <span class="tag-remove">
+                                    <i class="fas fa-times"></i>
+                                </span>
+                            </div>
+                            <div class="project-tag" data-project-id="proj002">
+                                京台高速山东段建设项目
+                                <span class="tag-remove">
+                                    <i class="fas fa-times"></i>
+                                </span>
+                            </div>
+                            <div class="project-tag" data-project-id="proj003">
+                                京港澳高速湖北段改造工程
+                                <span class="tag-remove">
+                                    <i class="fas fa-times"></i>
+                                </span>
+                            </div>
+                            <div class="project-tag" data-project-id="proj004">
+                                沈海高速江苏段拓宽工程
+                                <span class="tag-remove">
+                                    <i class="fas fa-times"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 用户列表和授权表格 -->
+                    <div class="authorization-grid">
+                        <!-- 用户列表 -->
+                        <div class="user-list-container">
+                            <div class="user-list-header">
+                                <div class="user-list-title">用户列表</div>
+                                <div class="user-list-search">
+                                    <input type="text" class="user-list-input" placeholder="搜索用户...">
+                                    <i class="fas fa-search user-list-icon"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="user-list">
+                                <div class="user-item active">
+                                    <div class="user-item-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="user-item-info">
+                                        <div class="user-item-name">王经理</div>
+                                        <div class="user-item-role">项目经理</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="user-item">
+                                    <div class="user-item-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="user-item-info">
+                                        <div class="user-item-name">李专员</div>
+                                        <div class="user-item-role">征拆专员</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="user-item">
+                                    <div class="user-item-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="user-item-info">
+                                        <div class="user-item-name">张财务</div>
+                                        <div class="user-item-role">财务专员</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="user-item">
+                                    <div class="user-item-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="user-item-info">
+                                        <div class="user-item-name">刘审计</div>
+                                        <div class="user-item-role">审核员</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="user-item">
+                                    <div class="user-item-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="user-item-info">
+                                        <div class="user-item-name">陈查看</div>
+                                        <div class="user-item-role">查看员</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="user-item">
+                                    <div class="user-item-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="user-item-info">
+                                        <div class="user-item-name">赵主管</div>
+                                        <div class="user-item-role">项目经理</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="user-item">
+                                    <div class="user-item-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="user-item-info">
+                                        <div class="user-item-name">孙助理</div>
+                                        <div class="user-item-role">征拆专员</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="user-item">
+                                    <div class="user-item-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="user-item-info">
+                                        <div class="user-item-name">周总</div>
+                                        <div class="user-item-role">查看员</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 授权表格 -->
+                        <div class="authorization-table-container">
+                            <div class="table-header">
+                                <div class="table-title">项目授权详情 - 王经理</div>
+                                <div class="table-actions">
+                                    <button class="btn btn-primary" id="addAuthorizationBtn">
+                                        <i class="fas fa-plus"></i>
+                                        添加授权
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="table">
+                                <div class="table-wrapper">
+                                    <div class="table-content">
+                                        <div class="table-row header">
+                                            <div class="table-cell narrow">
+                                                <input type="checkbox" id="selectAll" class="select-all">
+                                                <label for="selectAll"></label>
+                                            </div>
+                                            <div class="table-cell wider">项目名称</div>
+                                            <div class="table-cell">标段</div>
+                                            <div class="table-cell">授权范围</div>
+                                            <div class="table-cell">操作权限</div>
+                                            <div class="table-cell">授权时间</div>
+                                            <div class="table-cell">到期时间</div>
+                                            <div class="table-cell">操作</div>
+                                        </div>
+                                        
+                                        <div class="table-row">
+                                            <div class="table-cell narrow">
+                                                <input type="checkbox" class="select-item">
+                                            </div>
+                                            <div class="table-cell wider">京沪高速公路扩建工程</div>
+                                            <div class="table-cell">全标段</div>
+                                            <div class="table-cell">全部功能</div>
+                                            <div class="table-cell">
+                                                <div class="permission-control">
+                                                    <label class="permission-checkbox">
+                                                        <input type="checkbox" checked> 查看
+                                                    </label>
+                                                    <label class="permission-checkbox">
+                                                        <input type="checkbox" checked> 编辑
+                                                    </label>
+                                                    <label class="permission-checkbox">
+                                                        <input type="checkbox" checked> 审核
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="table-cell">2023-06-15</div>
+                                            <div class="table-cell">2024-06-15</div>
+                                            <div class="table-cell">
+                                                <div class="table-action">
+                                                    <button class="btn btn-outline" title="编辑">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline" title="移除">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="table-row">
+                                            <div class="table-cell narrow">
+                                                <input type="checkbox" class="select-item">
+                                            </div>
+                                            <div class="table-cell wider">京台高速山东段建设项目</div>
+                                            <div class="table-cell">第1-3标段</div>
+                                            <div class="table-cell">征地管理</div>
+                                            <div class="table-cell">
+                                                <div class="permission-control">
+                                                    <label class="permission-checkbox">
+                                                        <input type="checkbox" checked> 查看
+                                                    </label>
+                                                    <label class="permission-checkbox">
+                                                        <input type="checkbox" checked> 编辑
+                                                    </label>
+                                                    <label class="permission-checkbox">
+                                                        <input type="checkbox"> 审核
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="table-cell">2023-08-20</div>
+                                            <div class="table-cell">2024-08-20</div>
+                                            <div class="table-cell">
+                                                <div class="table-action">
+                                                    <button class="btn btn-outline" title="编辑">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline" title="移除">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="table-row">
+                                            <div class="table-cell narrow">
+                                                <input type="checkbox" class="select-item">
+                                            </div>
+                                            <div class="table-cell wider">京港澳高速湖北段改造工程</div>
+                                            <div class="table-cell">第2标段</div>
+                                            <div class="table-cell">房屋管理</div>
+                                            <div class="table-cell">
+                                                <div class="permission-control">
+                                                    <label class="permission-checkbox">
+                                                        <input type="checkbox" checked> 查看
+                                                    </label>
+                                                    <label class="permission-checkbox">
+                                                        <input type="checkbox" checked> 编辑
+                                                    </label>
+                                                    <label class="permission-checkbox">
+                                                        <input type="checkbox"> 审核
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="table-cell">2023-10-05</div>
+                                            <div class="table-cell">2024-10-05</div>
+                                            <div class="table-cell">
+                                                <div class="table-action">
+                                                    <button class="btn btn-outline" title="编辑">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline" title="移除">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="table-row">
+                                            <div class="table-cell narrow">
+                                                <input type="checkbox" class="select-item">
+                                            </div>
+                                            <div class="table-cell wider">沈海高速江苏段拓宽工程</div>
+                                            <div class="table-cell">全标段</div>
+                                            <div class="table-cell">统计分析</div>
+                                            <div class="table-cell">
+                                                <div class="permission-control">
+                                                    <label class="permission-checkbox">
+                                                        <input type="checkbox" checked> 查看
+                                                    </label>
+                                                    <label class="permission-checkbox">
+                                                        <input type="checkbox"> 编辑
+                                                    </label>
+                                                    <label class="permission-checkbox">
+                                                        <input type="checkbox"> 审核
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="table-cell">2023-12-10</div>
+                                            <div class="table-cell">2024-12-10</div>
+                                            <div class="table-cell">
+                                                <div class="table-action">
+                                                    <button class="btn btn-outline" title="编辑">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline" title="移除">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 分页控件 -->
+                                <div class="pagination">
+                                    <div class="pagination-info">
+                                        显示 1-4 条，共 12 条
+                                    </div>
+                                    <div class="pagination-controls">
+                                        <button class="pagination-button" disabled>
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <button class="pagination-button active">1</button>
+                                        <button class="pagination-button">2</button>
+                                        <button class="pagination-button">3</button>
+                                        <button class="pagination-button">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                    <select class="pagination-select">
+                                        <option value="4">4条/页</option>
+                                        <option value="10">10条/页</option>
+                                        <option value="20">20条/页</option>
+                                        <option value="50">50条/页</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 授权历史记录 -->
+            <div class="authorization-history">
+                <div class="history-header">
+                    <h2 class="history-title">授权历史记录</h2>
+                    <div class="history-actions">
+                        <button class="btn btn-outline" id="exportHistoryBtn">
+                            <i class="fas fa-file-export"></i>
+                            导出历史
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="history-content">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>操作人</th>
+                                <th>操作类型</th>
+                                <th>用户</th>
+                                <th>项目</th>
+                                <th>操作内容</th>
+                                <th>操作时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>张管理员</td>
+                                <td>新增授权</td>
+                                <td>王经理</td>
+                                <td>京沪高速公路扩建工程</td>
+                                <td>授予全部功能权限</td>
+                                <td>2023-06-15 10:23:45</td>
+                            </tr>
+                            <tr>
+                                <td>张管理员</td>
+                                <td>编辑授权</td>
+                                <td>李专员</td>
+                                <td>京台高速山东段建设项目</td>
+                                <td>修改操作权限</td>
+                                <td>2023-08-20 14:35:22</td>
+                            </tr>
+                            <tr>
+                                <td>赵主管</td>
+                                <td>移除授权</td>
+                                <td>陈查看</td>
+                                <td>京港澳高速湖北段改造工程</td>
+                                <td>移除第3标段授权</td>
+                                <td>2023-10-05 09:12:58</td>
+                            </tr>
+                            <tr>
+                                <td>张管理员</td>
+                                <td>新增授权</td>
+                                <td>王经理</td>
+                                <td>沈海高速江苏段拓宽工程</td>
+                                <td>授予统计分析权限</td>
+                                <td>2023-12-10 16:47:13</td>
+                            </tr>
+                            <tr>
+                                <td>赵主管</td>
+                                <td>编辑授权</td>
+                                <td>刘审计</td>
+                                <td>京沪高速公路扩建工程</td>
+                                <td>延长授权期限</td>
+                                <td>2023-12-20 11:05:36</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <!-- 分页控件 -->
+                    <div class="pagination">
+                        <div class="pagination-info">
+                            显示 1-5 条，共 36 条
+                        </div>
+                        <div class="pagination-controls">
+                            <button class="pagination-button" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="pagination-button active">1</button>
+                            <button class="pagination-button">2</button>
+                            <button class="pagination-button">3</button>
+                            <button class="pagination-button">4</button>
+                            <button class="pagination-button">5</button>
+                            <button class="pagination-button">6</button>
+                            <button class="pagination-button">7</button>
+                            <button class="pagination-button">8</button>
+                            <button class="pagination-button">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <select class="pagination-select">
+                            <option value="5">5条/页</option>
+                            <option value="10">10条/页</option>
+                            <option value="20">20条/页</option>
+                            <option value="50">50条/页</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- 添加授权模态框 -->
+    <div class="modal" id="addAuthorizationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">添加项目授权</h3>
+                <button class="modal-close" id="closeAddModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="addAuthorizationForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">用户</label>
+                            <input type="text" class="form-input" value="王经理" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">项目名称</label>
+                            <select class="form-select" required>
+                                <option value="">请选择项目</option>
+                                <option value="proj001">京沪高速公路扩建工程</option>
+                                <option value="proj002">京台高速山东段建设项目</option>
+                                <option value="proj003">京港澳高速湖北段改造工程</option>
+                                <option value="proj004">沈海高速江苏段拓宽工程</option>
+                                <option value="proj005">沪杭高速浙江段改造工程</option>
+                                <option value="proj006">长深高速江苏段建设项目</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">标段</label>
+                            <select class="form-select" required>
+                                <option value="">请选择标段</option>
+                                <option value="all">全标段</option>
+                                <option value="1">第1标段</option>
+                                <option value="2">第2标段</option>
+                                <option value="3">第3标段</option>
+                                <option value="4">第4标段</option>
+                                <option value="5">第5标段</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">授权范围</label>
+                            <select class="form-select" required>
+                                <option value="">请选择授权范围</option>
+                                <option value="all">全部功能</option>
+                                <option value="land">征地管理</option>
+                                <option value="house">房屋管理</option>
+                                <option value="attachment">附着物管理</option>
+                                <option value="audit">审核管理</option>
+                                <option value="agreement">协议管理</option>
+                                <option value="settlement">结算管理</option>
+                                <option value="stats">统计分析</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">操作权限</label>
+                            <div class="permission-control">
+                                <label class="permission-checkbox">
+                                    <input type="checkbox" name="permissions" value="view"> 查看
+                                </label>
+                                <label class="permission-checkbox">
+                                    <input type="checkbox" name="permissions" value="edit"> 编辑
+                                </label>
+                                <label class="permission-checkbox">
+                                    <input type="checkbox" name="permissions" value="audit"> 审核
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">授权期限</label>
+                            <select class="form-select" required>
+                                <option value="">请选择授权期限</option>
+                                <option value="3">3个月</option>
+                                <option value="6">6个月</option>
+                                <option value="12">1年</option>
+                                <option value="24">2年</option>
+                                <option value="unlimited">永久有效</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">备注</label>
+                        <textarea class="form-textarea" placeholder="请输入备注信息（可选）"></textarea>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelAddAuthorization">取消</button>
+                <button class="btn btn-primary" id="confirmAddAuthorization">确认添加</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 批量授权模态框 -->
+    <div class="modal" id="batchAuthorizationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">批量项目授权</h3>
+                <button class="modal-close" id="closeBatchModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="batchAuthorizationForm">
+                    <div class="form-group">
+                        <label class="form-label">选择用户</label>
+                        <div class="user-list" style="max-height: 200px; margin-bottom: 12px;">
+                            <div class="user-item">
+                                <div class="user-item-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="user-item-info">
+                                    <div class="user-item-name">王经理</div>
+                                    <div class="user-item-role">项目经理</div>
+                                </div>
+                                <input type="checkbox" class="select-item">
+                            </div>
+                            
+                            <div class="user-item">
+                                <div class="user-item-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="user-item-info">
+                                    <div class="user-item-name">李专员</div>
+                                    <div class="user-item-role">征拆专员</div>
+                                </div>
+                                <input type="checkbox" class="select-item">
+                            </div>
+                            
+                            <div class="user-item">
+                                <div class="user-item-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="user-item-info">
+                                    <div class="user-item-name">张财务</div>
+                                    <div class="user-item-role">财务专员</div>
+                                </div>
+                                <input type="checkbox" class="select-item">
+                            </div>
+                            
+                            <div class="user-item">
+                                <div class="user-item-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="user-item-info">
+                                    <div class="user-item-name">刘审计</div>
+                                    <div class="user-item-role">审核员</div>
+                                </div>
+                                <input type="checkbox" class="select-item">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">项目名称</label>
+                            <select class="form-select" required>
+                                <option value="">请选择项目</option>
+                                <option value="proj001">京沪高速公路扩建工程</option>
+                                <option value="proj002">京台高速山东段建设项目</option>
+                                <option value="proj003">京港澳高速湖北段改造工程</option>
+                                <option value="proj004">沈海高速江苏段拓宽工程</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">标段</label>
+                            <select class="form-select" required>
+                                <option value="">请选择标段</option>
+                                <option value="all">全标段</option>
+                                <option value="1">第1标段</option>
+                                <option value="2">第2标段</option>
+                                <option value="3">第3标段</option>
+                                <option value="4">第4标段</option>
+                                <option value="5">第5标段</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">授权范围</label>
+                            <select class="form-select" required>
+                                <option value="">请选择授权范围</option>
+                                <option value="all">全部功能</option>
+                                <option value="land">征地管理</option>
+                                <option value="house">房屋管理</option>
+                                <option value="attachment">附着物管理</option>
+                                <option value="audit">审核管理</option>
+                                <option value="agreement">协议管理</option>
+                                <option value="settlement">结算管理</option>
+                                <option value="stats">统计分析</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">操作权限</label>
+                            <div class="permission-control">
+                                <label class="permission-checkbox">
+                                    <input type="checkbox" name="batchPermissions" value="view"> 查看
+                                </label>
+                                <label class="permission-checkbox">
+                                    <input type="checkbox" name="batchPermissions" value="edit"> 编辑
+                                </label>
+                                <label class="permission-checkbox">
+                                    <input type="checkbox" name="batchPermissions" value="audit"> 审核
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">备注</label>
+                        <textarea class="form-textarea" placeholder="请输入备注信息（可选）"></textarea>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelBatchAuthorization">取消</button>
+                <button class="btn btn-primary" id="confirmBatchAuthorization">确认授权</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 编辑授权模态框 -->
+    <div class="modal" id="editAuthorizationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">编辑项目授权</h3>
+                <button class="modal-close" id="closeEditModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="editAuthorizationForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">用户</label>
+                            <input type="text" class="form-input" value="王经理" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">项目名称</label>
+                            <input type="text" class="form-input" value="京沪高速公路扩建工程" disabled>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">标段</label>
+                            <select class="form-select" required>
+                                <option value="all">全标段</option>
+                                <option value="1">第1标段</option>
+                                <option value="2">第2标段</option>
+                                <option value="3">第3标段</option>
+                                <option value="4">第4标段</option>
+                                <option value="5">第5标段</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">授权范围</label>
+                            <select class="form-select" required>
+                                <option value="all">全部功能</option>
+                                <option value="land">征地管理</option>
+                                <option value="house">房屋管理</option>
+                                <option value="attachment">附着物管理</option>
+                                <option value="audit">审核管理</option>
+                                <option value="agreement">协议管理</option>
+                                <option value="settlement">结算管理</option>
+                                <option value="stats">统计分析</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">操作权限</label>
+                            <div class="permission-control">
+                                <label class="permission-checkbox">
+                                    <input type="checkbox" name="editPermissions" value="view" checked> 查看
+                                </label>
+                                <label class="permission-checkbox">
+                                    <input type="checkbox" name="editPermissions" value="edit" checked> 编辑
+                                </label>
+                                <label class="permission-checkbox">
+                                    <input type="checkbox" name="editPermissions" value="audit" checked> 审核
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">授权期限</label>
+                            <select class="form-select" required>
+                                <option value="3">3个月</option>
+                                <option value="6">6个月</option>
+                                <option value="12" selected>1年</option>
+                                <option value="24">2年</option>
+                                <option value="unlimited">永久有效</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">备注</label>
+                        <textarea class="form-textarea">项目负责人授权</textarea>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelEditAuthorization">取消</button>
+                <button class="btn btn-primary" id="confirmEditAuthorization">确认修改</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 确认对话框 -->
+    <div class="confirm-dialog" id="confirmDialog">
+        <div class="confirm-dialog-content">
+            <div class="confirm-dialog-header">
+                <div class="confirm-dialog-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+            </div>
+            
+            <div class="confirm-dialog-message">
+                确定要移除选中的授权吗？此操作不可撤销。
+            </div>
+            
+            <div class="confirm-dialog-footer">
+                <button class="btn btn-secondary" id="cancelConfirm">取消</button>
+                <button class="btn btn-danger" id="confirmAction">确认</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 通知提示 -->
+    <div id="notification" style="position: fixed; top: 80px; right: 20px; background-color: #10b981; color: white; padding: 12px 20px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); display: none; z-index: 3000; transition: all 0.3s ease;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-check-circle"></i>
+            <span id="notificationMessage">操作成功</span>
+        </div>
+    </div>
+
+    <script>
+        // 侧边栏切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            const mainContent = document.querySelector('.main-content');
+            const searchBar = document.querySelector('.search-bar');
+            const userAvatar = document.querySelector('.user-avatar');
+            const searchInput = document.querySelector('.search-input');
+            const tableRows = document.querySelectorAll('.authorization-table tbody tr');
+            const historyTableRows = document.querySelectorAll('.history-table tbody tr');
+            
+            // 侧边栏切换
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('sidebar-collapsed');
+            });
+            
+            // 项目选择改变事件
+            const projectSelect = document.getElementById('projectSelect');
+            const sectionSelect = document.getElementById('sectionSelect');
+            
+            projectSelect.addEventListener('change', function() {
+                // 这里可以根据项目选择动态加载对应的标段信息
+                // 实际项目中可能需要API调用获取数据
+                if (this.value) {
+                    sectionSelect.disabled = false;
+                    // 模拟根据项目加载标段
+                    console.log('加载项目ID:', this.value, '的标段信息');
+                } else {
+                    sectionSelect.disabled = true;
+                }
+            });
+            
+            // 搜索功能
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                
+                tableRows.forEach(row => {
+                    const rowText = row.textContent.toLowerCase();
+                    if (rowText.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+            
+            // 分页控件交互
+            const paginationButtons = document.querySelectorAll('.pagination-button');
+            const paginationSelects = document.querySelectorAll('.pagination-select');
+            
+            paginationButtons.forEach(button => {
+                if (!button.disabled) {
+                    button.addEventListener('click', function() {
+                        // 移除所有激活状态
+                        document.querySelectorAll('.pagination-button.active').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        
+                        // 添加激活状态
+                        if (this.textContent.trim() !== '' && !isNaN(parseInt(this.textContent.trim()))) {
+                            this.classList.add('active');
+                            console.log('切换到页码:', this.textContent.trim());
+                        }
+                    });
+                }
+            });
+            
+            paginationSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    console.log('每页显示数量改为:', this.value);
+                    // 实际应用中需要重新加载数据
+                });
+            });
+            
+            // 模态框控制
+            const modals = {
+                addAuthorization: document.getElementById('addAuthorizationModal'),
+                batchAuthorization: document.getElementById('batchAuthorizationModal'),
+                editAuthorization: document.getElementById('editAuthorizationModal'),
+                confirmDialog: document.getElementById('confirmDialog')
+            };
+            
+            // 打开模态框函数
+            function openModal(modalId) {
+                const modal = modals[modalId];
+                if (modal) {
+                    modal.style.display = 'flex';
+                    // 阻止背景滚动
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+            
+            // 关闭模态框函数
+            function closeModal(modalId) {
+                const modal = modals[modalId];
+                if (modal) {
+                    modal.style.display = 'none';
+                    // 恢复背景滚动
+                    document.body.style.overflow = 'auto';
+                }
+            }
+            
+            // 关闭所有模态框
+            function closeAllModals() {
+                Object.keys(modals).forEach(modalId => {
+                    closeModal(modalId);
+                });
+            }
+            
+            // 添加授权按钮事件
+            document.getElementById('addAuthorizationBtn').addEventListener('click', function() {
+                openModal('addAuthorization');
+            });
+            
+            // 批量授权按钮事件
+            document.getElementById('batchAuthorizationBtn').addEventListener('click', function() {
+                openModal('batchAuthorization');
+            });
+            
+            // 编辑授权按钮事件
+            const editButtons = document.querySelectorAll('.authorization-table button[title="编辑"]');
+            editButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    openModal('editAuthorization');
+                });
+            });
+            
+            // 移除授权按钮事件
+            const removeButtons = document.querySelectorAll('.authorization-table button[title="移除"]');
+            removeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    openModal('confirmDialog');
+                });
+            });
+            
+            // 模态框关闭按钮事件
+            document.getElementById('closeAddModal').addEventListener('click', function() {
+                closeModal('addAuthorization');
+            });
+            
+            document.getElementById('cancelAddAuthorization').addEventListener('click', function() {
+                closeModal('addAuthorization');
+            });
+            
+            document.getElementById('closeBatchModal').addEventListener('click', function() {
+                closeModal('batchAuthorization');
+            });
+            
+            document.getElementById('cancelBatchAuthorization').addEventListener('click', function() {
+                closeModal('batchAuthorization');
+            });
+            
+            document.getElementById('closeEditModal').addEventListener('click', function() {
+                closeModal('editAuthorization');
+            });
+            
+            document.getElementById('cancelEditAuthorization').addEventListener('click', function() {
+                closeModal('editAuthorization');
+            });
+            
+            document.getElementById('cancelConfirm').addEventListener('click', function() {
+                closeModal('confirmDialog');
+            });
+            
+            // 确认对话框确认按钮事件
+            document.getElementById('confirmAction').addEventListener('click', function() {
+                closeModal('confirmDialog');
+                // 显示操作成功通知
+                showNotification('授权移除成功');
+            });
+            
+            // 表单提交事件
+            document.getElementById('confirmAddAuthorization').addEventListener('click', function() {
+                const form = document.getElementById('addAuthorizationForm');
+                if (form.checkValidity()) {
+                    // 模拟表单提交
+                    console.log('添加授权表单提交');
+                    closeModal('addAuthorization');
+                    showNotification('授权添加成功');
+                }
+            });
+            
+            document.getElementById('confirmBatchAuthorization').addEventListener('click', function() {
+                // 检查是否有选中的用户
+                const selectedUsers = document.querySelectorAll('#batchAuthorizationModal .select-item:checked');
+                if (selectedUsers.length === 0) {
+                    alert('请至少选择一个用户');
+                    return;
+                }
+                
+                const form = document.getElementById('batchAuthorizationForm');
+                if (form.checkValidity()) {
+                    // 模拟批量授权提交
+                    console.log('批量授权表单提交，用户数量:', selectedUsers.length);
+                    closeModal('batchAuthorization');
+                    showNotification('批量授权添加成功');
+                }
+            });
+            
+            document.getElementById('confirmEditAuthorization').addEventListener('click', function() {
+                const form = document.getElementById('editAuthorizationForm');
+                if (form.checkValidity()) {
+                    // 模拟编辑表单提交
+                    console.log('编辑授权表单提交');
+                    closeModal('editAuthorization');
+                    showNotification('授权修改成功');
+                }
+            });
+            
+            // 导出历史记录按钮事件
+            document.getElementById('exportHistoryBtn').addEventListener('click', function() {
+                console.log('导出授权历史记录');
+                showNotification('历史记录导出成功');
+            });
+            
+            // 显示通知函数
+            function showNotification(message) {
+                const notification = document.getElementById('notification');
+                const notificationMessage = document.getElementById('notificationMessage');
+                
+                notificationMessage.textContent = message;
+                notification.style.display = 'block';
+                
+                // 3秒后自动隐藏
+                setTimeout(function() {
+                    notification.style.display = 'none';
+                }, 3000);
+            }
+            
+            // 点击模态框外部关闭
+            window.addEventListener('click', function(event) {
+                Object.keys(modals).forEach(modalId => {
+                    const modal = modals[modalId];
+                    if (modal && event.target === modal) {
+                        closeModal(modalId);
+                    }
+                });
+            });
+            
+            // ESC键关闭模态框
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeAllModals();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

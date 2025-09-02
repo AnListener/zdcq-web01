@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高速公路征地拆迁管理系统 - 审核台账</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 审核台账特定样式 */
+        .audit-ledger-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 搜索和筛选区域 */
+        .search-filter-container {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .search-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .search-group {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .search-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+            min-width: 80px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .search-select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+        
+        .search-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .btn-filter {
+            padding: 8px 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-filter:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-reset {
+            padding: 8px 16px;
+            background-color: white;
+            color: var(--info);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-reset:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* 数据卡片区域 */
+        .data-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .data-card {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .data-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+        
+        .card-icon-primary {
+            background-color: var(--primary);
+        }
+        
+        .card-icon-info {
+            background-color: var(--info);
+        }
+        
+        .card-icon-success {
+            background-color: var(--success);
+        }
+        
+        .card-icon-warning {
+            background-color: var(--warning);
+        }
+        
+        .card-title {
+            font-size: 14px;
+            color: var(--info);
+            font-weight: 500;
+        }
+        
+        .card-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .card-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .card-change.positive {
+            color: var(--success);
+        }
+        
+        .card-change.negative {
+            color: var(--danger);
+        }
+        
+        /* 表格区域 */
+        .table-container {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background-color: var(--bg-light);
+        }
+        
+        .table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-action-button {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .table-action-button:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background-color: var(--bg-light);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        
+        .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--dark);
+        }
+        
+        .data-table tr:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        .table-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-primary {
+            background-color: rgba(22, 93, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        .badge-success {
+            background-color: rgba(0, 180, 42, 0.1);
+            color: var(--success);
+        }
+        
+        .badge-warning {
+            background-color: rgba(255, 125, 0, 0.1);
+            color: var(--warning);
+        }
+        
+        .badge-danger {
+            background-color: rgba(245, 63, 63, 0.1);
+            color: var(--danger);
+        }
+        
+        .table-actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-action {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .table-action:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .table-action.view {
+            color: var(--primary);
+        }
+        
+        .table-action.edit {
+            color: var(--warning);
+        }
+        
+        .table-action.delete {
+            color: var(--danger);
+        }
+        
+        .table-action.audit {
+            color: var(--success);
+        }
+        
+        /* 分页区域 */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            background-color: var(--bg-light);
+        }
+        
+        .pagination-info {
+            font-size: 14px;
+            color: var(--info);
+        }
+        
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .pagination-button {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .pagination-button:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .pagination-button.active {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-select {
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        /* 审核对话框样式 */
+        .audit-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .audit-modal-content {
+            background-color: white;
+            border-radius: 8px;
+            padding: 24px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .audit-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .audit-modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .audit-modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--info);
+        }
+        
+        .audit-modal-close:hover {
+            color: var(--primary);
+        }
+        
+        .audit-form-group {
+            margin-bottom: 16px;
+        }
+        
+        .audit-form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .audit-form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .audit-form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .audit-form-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+        
+        .audit-form-textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .audit-form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .audit-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .btn-approve {
+            padding: 8px 20px;
+            background-color: var(--success);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-approve:hover {
+            background-color: #00a53c;
+        }
+        
+        .btn-reject {
+            padding: 8px 20px;
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-reject:hover {
+            background-color: #e23e3e;
+        }
+        
+        .btn-cancel {
+            padding: 8px 20px;
+            background-color: white;
+            color: var(--info);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-cancel:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* 响应式样式 */
+        @media (max-width: 768px) {
+            .search-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .search-group {
+                width: 100%;
+            }
+            
+            .data-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .table-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .pagination-container {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .pagination-controls {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .audit-modal-content {
+                width: 95%;
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="audit-ledger-container">
+        <!-- 侧边栏导航 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-road logo-icon"></i>
+                    <span class="logo-text">征拆管理系统</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <div class="menu-section-title">主导航</div>
+                
+                <a href="dashboard.html" class="menu-item">
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">仪表盘</span>
+                </a>
+                
+                <div class="menu-section-title">GIS数据管理</div>
+                
+                <a href="gis-data-upload.html" class="menu-item">
+                    <i class="fas fa-upload menu-icon"></i>
+                    <span class="menu-text">测绘数据上传</span>
+                </a>
+                
+                <a href="gis-publish.html" class="menu-item">
+                    <i class="fas fa-map-marked-alt menu-icon"></i>
+                    <span class="menu-text">GIS发布</span>
+                </a>
+                
+                <div class="menu-section-title">台账管理</div>
+                
+                <a href="gis-ledger.html" class="menu-item">
+                    <i class="fas fa-database menu-icon"></i>
+                    <span class="menu-text">GIS台账</span>
+                </a>
+                
+                <a href="land-ledger.html" class="menu-item">
+                    <i class="fas fa-paragraph menu-icon"></i>
+                    <span class="menu-text">征地台账</span>
+                </a>
+                
+                <a href="house-ledger.html" class="menu-item">
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">房屋台账</span>
+                </a>
+                
+                <a href="attachment-ledger.html" class="menu-item">
+                    <i class="fas fa-paperclip menu-icon"></i>
+                    <span class="menu-text">附着物台账</span>
+                </a>
+                
+                <a href="audit-ledger.html" class="menu-item active">
+                    <i class="fas fa-search menu-icon"></i>
+                    <span class="menu-text">审核台账</span>
+                </a>
+                
+                <a href="agreement-ledger.html" class="menu-item">
+                    <i class="fas fa-file-contract menu-icon"></i>
+                    <span class="menu-text">协议台账</span>
+                </a>
+                
+                <a href="settlement-ledger.html" class="menu-item">
+                    <i class="fas fa-money-bill-wave menu-icon"></i>
+                    <span class="menu-text">结算台账</span>
+                    <span class="menu-badge">5</span>
+                </a>
+                
+                <div class="menu-section-title">基础配置管理</div>
+                
+                <a href="form-template.html" class="menu-item">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">表单协议模板管理</span>
+                </a>
+                
+                <a href="process-config.html" class="menu-item">
+                    <i class="fas fa-sitemap menu-icon"></i>
+                    <span class="menu-text">流程配置</span>
+                </a>
+                
+                <a href="compensation-standard.html" class="menu-item">
+                    <i class="fas fa-list-ol menu-icon"></i>
+                    <span class="menu-text">区域补偿标准库</span>
+                </a>
+                
+                <div class="menu-section-title">统计分析</div>
+                
+                <a href="demolition-stats.html" class="menu-item">
+                    <i class="fas fa-chart-bar menu-icon"></i>
+                    <span class="menu-text">征拆区域统计</span>
+                </a>
+                
+                <a href="project-stats.html" class="menu-item">
+                    <i class="fas fa-chart-line menu-icon"></i>
+                    <span class="menu-text">项目统计</span>
+                </a>
+                
+                <a href="group-stats.html" class="menu-item">
+                    <i class="fas fa-chart-pie menu-icon"></i>
+                    <span class="menu-text">集团统计</span>
+                </a>
+                
+                <div class="menu-section-title">系统管理</div>
+                
+                <a href="user-role.html" class="menu-item">
+                    <i class="fas fa-users-cog menu-icon"></i>
+                    <span class="menu-text">用户角色管理</span>
+                </a>
+                
+                <a href="project-auth.html" class="menu-item">
+                    <i class="fas fa-key menu-icon"></i>
+                    <span class="menu-text">项目授权管理</span>
+                </a>
+                
+                <div class="menu-section-title">辅助支持</div>
+                
+                <a href="function-demo.html" class="menu-item">
+                    <i class="fas fa-play-circle menu-icon"></i>
+                    <span class="menu-text">功能演示入口</span>
+                </a>
+                
+                <a href="training-materials.html" class="menu-item">
+                    <i class="fas fa-book menu-icon"></i>
+                    <span class="menu-text">培训资料</span>
+                </a>
+                
+                <a href="operation-manual.html" class="menu-item">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">操作手册</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="main-content" id="mainContent">
+            <!-- 顶部导航栏 -->
+            <header class="top-nav" id="topNav">
+                <div class="nav-left">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="nav-title">审核台账</h1>
+                </div>
+                
+                <div class="nav-right">
+                    <div class="nav-item">
+                        <i class="fas fa-bell nav-icon"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-envelope nav-icon"></i>
+                        <span class="notification-badge">2</span>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-cog nav-icon"></i>
+                    </div>
+                    
+                    <div class="user-profile">
+                        <div class="avatar">张</div>
+                        <div class="user-info">
+                            <div class="user-name">张三</div>
+                            <div class="user-role">系统管理员</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- 页面内容 -->
+            <div class="page-content">
+                <div class="page-header">
+                    <h2 class="page-title">审核台账管理</h2>
+                    <div class="flex gap-3">
+                        <button class="btn btn-primary" id="batchAuditBtn">
+                            <i class="fas fa-check-double"></i> 批量审核
+                        </button>
+                        <button class="btn btn-secondary" id="exportBtn">
+                            <i class="fas fa-file-export"></i> 导出
+                        </button>
+                        <button class="btn btn-secondary" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i> 刷新
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 搜索和筛选区域 -->
+                <div class="search-filter-container">
+                    <div class="search-row">
+                        <div class="search-group">
+                            <label for="projectName">项目名称</label>
+                            <select id="projectName" class="search-select">
+                                <option value="">全部项目</option>
+                                <option value="1">京沪高速扩建工程</option>
+                                <option value="2">京港澳高速连接线</option>
+                                <option value="3">京藏高速大修工程</option>
+                                <option value="4">沈海高速服务区扩建</option>
+                                <option value="5">长深高速互通立交</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="section">标段</label>
+                            <select id="section" class="search-select">
+                                <option value="">全部标段</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="auditType">审核类型</label>
+                            <select id="auditType" class="search-select">
+                                <option value="">全部类型</option>
+                                <option value="land">征地</option>
+                                <option value="house">房屋</option>
+                                <option value="attachment">附着物</option>
+                                <option value="agreement">协议</option>
+                                <option value="settlement">结算</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="search-row">
+                        <div class="search-group">
+                            <label for="auditStatus">审核状态</label>
+                            <select id="auditStatus" class="search-select">
+                                <option value="">全部状态</option>
+                                <option value="pending">待审核</option>
+                                <option value="approved">已审核</option>
+                                <option value="rejected">已驳回</option>
+                                <option value="partiallyApproved">部分通过</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="auditor">审核人</label>
+                            <input type="text" id="auditor" class="search-input" placeholder="输入审核人姓名">
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="auditPeriod">审核时间</label>
+                            <input type="text" id="auditPeriod" class="search-input" placeholder="选择时间范围">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button class="btn-reset" id="resetFilter">
+                            <i class="fas fa-redo-alt"></i> 重置
+                        </button>
+                        <button class="btn-filter" id="applyFilter">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 数据卡片区域 -->
+                <div class="data-cards">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-primary">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <div class="card-title">待审核总量</div>
+                        </div>
+                        <div class="card-value">1,245</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长15%</span>
+                        </div>
+                        <div class="card-unit">项</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="card-title">已审核通过</div>
+                        </div>
+                        <div class="card-value">4,876</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长8%</span>
+                        </div>
+                        <div class="card-unit">项</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-danger">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <div class="card-title">已审核驳回</div>
+                        </div>
+                        <div class="card-value">356</div>
+                        <div class="card-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>较上月减少10%</span>
+                        </div>
+                        <div class="card-unit">项</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-info">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <div class="card-title">审核通过率</div>
+                        </div>
+                        <div class="card-value">93.3</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月提升2.5%</span>
+                        </div>
+                        <div class="card-unit">%</div>
+                    </div>
+                </div>
+                
+                <!-- 表格区域 -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">审核台账列表</div>
+                        <div class="table-actions">
+                            <button class="table-action-button" id="pendingFirstBtn">
+                                <i class="fas fa-arrow-up"></i>
+                                待审核项置顶
+                            </button>
+                            <button class="table-action-button" id="exportSelectedBtn">
+                                <i class="fas fa-file-export"></i>
+                                导出选中
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th width="40">
+                                        <input type="checkbox" class="table-checkbox" id="selectAll">
+                                    </th>
+                                    <th>审核编号</th>
+                                    <th>审核类型</th>
+                                    <th>关联编号</th>
+                                    <th>所属项目</th>
+                                    <th>提交人</th>
+                                    <th>提交时间</th>
+                                    <th>审核人</th>
+                                    <th>审核时间</th>
+                                    <th>审核状态</th>
+                                    <th>备注</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="pending-row">
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>SH20230615-001</td>
+                                    <td>征地</td>
+                                    <td>ZD20230615-001</td>
+                                    <td>京沪高速扩建工程</td>
+                                    <td>李四</td>
+                                    <td>2023-06-15 14:30</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>
+                                        <span class="table-badge badge-warning">待审核</span>
+                                    </td>
+                                    <td>无</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action audit" title="审核">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="table-action detail" title="详情">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="pending-row">
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>SH20230615-002</td>
+                                    <td>房屋</td>
+                                    <td>FW20230615-001</td>
+                                    <td>京沪高速扩建工程</td>
+                                    <td>王五</td>
+                                    <td>2023-06-15 11:45</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>
+                                        <span class="table-badge badge-warning">待审核</span>
+                                    </td>
+                                    <td>无</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action audit" title="审核">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="table-action detail" title="详情">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="pending-row">
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>SH20230610-003</td>
+                                    <td>附着物</td>
+                                    <td>FZW20230610-003</td>
+                                    <td>京沪高速扩建工程</td>
+                                    <td>赵六</td>
+                                    <td>2023-06-10 09:20</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>
+                                        <span class="table-badge badge-warning">待审核</span>
+                                    </td>
+                                    <td>无</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action audit" title="审核">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="table-action detail" title="详情">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>SH20230608-004</td>
+                                    <td>协议</td>
+                                    <td>XY20230608-001</td>
+                                    <td>京港澳高速连接线</td>
+                                    <td>钱七</td>
+                                    <td>2023-06-08 16:15</td>
+                                    <td>张三</td>
+                                    <td>2023-06-09 10:30</td>
+                                    <td>
+                                        <span class="table-badge badge-success">已审核</span>
+                                    </td>
+                                    <td>审核通过，金额无误</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action detail" title="详情">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>SH20230605-005</td>
+                                    <td>附着物</td>
+                                    <td>FZW20230605-005</td>
+                                    <td>京藏高速大修工程</td>
+                                    <td>孙八</td>
+                                    <td>2023-06-05 13:40</td>
+                                    <td>张三</td>
+                                    <td>2023-06-06 14:20</td>
+                                    <td>
+                                        <span class="table-badge badge-danger">已驳回</span>
+                                    </td>
+                                    <td>数据不全，请补充相关证明材料</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action detail" title="详情">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>SH20230603-006</td>
+                                    <td>结算</td>
+                                    <td>JS20230603-001</td>
+                                    <td>沈海高速服务区扩建</td>
+                                    <td>周九</td>
+                                    <td>2023-06-03 10:15</td>
+                                    <td>李五</td>
+                                    <td>2023-06-04 11:30</td>
+                                    <td>
+                                        <span class="table-badge badge-primary">部分通过</span>
+                                    </td>
+                                    <td>部分金额需要重新核算</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action detail" title="详情">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="table-checkbox">
+                                    </td>
+                                    <td>SH20230528-007</td>
+                                    <td>征地</td>
+                                    <td>ZD20230528-001</td>
+                                    <td>长深高速互通立交</td>
+                                    <td>吴十</td>
+                                    <td>2023-05-28 15:50</td>
+                                    <td>李五</td>
+                                    <td>2023-05-29 09:10</td>
+                                    <td>
+                                        <span class="table-badge badge-success">已审核</span>
+                                    </td>
+                                    <td>审核通过</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action detail" title="详情">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 分页区域 -->
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            显示 1-7 条，共 6,477 条
+                        </div>
+                        
+                        <div class="pagination-controls">
+                            <button class="pagination-button" disabled>
+                                <i class="fas fa-angle-left"></i>
+                            </button>
+                            <button class="pagination-button active">1</button>
+                            <button class="pagination-button">2</button>
+                            <button class="pagination-button">3</button>
+                            <button class="pagination-button">4</button>
+                            <button class="pagination-button">5</button>
+                            <button class="pagination-button">
+                                <i class="fas fa-angle-right"></i>
+                            </button>
+                            <select class="pagination-select">
+                                <option value="10">10条/页</option>
+                                <option value="20">20条/页</option>
+                                <option value="50">50条/页</option>
+                                <option value="100">100条/页</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 审核对话框 -->
+    <div class="audit-modal" id="auditModal">
+        <div class="audit-modal-content">
+            <div class="audit-modal-header">
+                <div class="audit-modal-title">审核记录</div>
+                <button class="audit-modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="audit-form-group">
+                <label for="auditRecordId">审核编号</label>
+                <input type="text" id="auditRecordId" class="audit-form-control" readonly>
+            </div>
+            
+            <div class="audit-form-group">
+                <label for="auditType">审核类型</label>
+                <input type="text" id="auditType" class="audit-form-control" readonly>
+            </div>
+            
+            <div class="audit-form-group">
+                <label for="relatedId">关联编号</label>
+                <input type="text" id="relatedId" class="audit-form-control" readonly>
+            </div>
+            
+            <div class="audit-form-group">
+                <label for="projectName">所属项目</label>
+                <input type="text" id="projectName" class="audit-form-control" readonly>
+            </div>
+            
+            <div class="audit-form-group">
+                <label for="submitter">提交人</label>
+                <input type="text" id="submitter" class="audit-form-control" readonly>
+            </div>
+            
+            <div class="audit-form-group">
+                <label for="submitTime">提交时间</label>
+                <input type="text" id="submitTime" class="audit-form-control" readonly>
+            </div>
+            
+            <div class="audit-form-group">
+                <label for="currentAuditor">审核人</label>
+                <input type="text" id="currentAuditor" class="audit-form-control" value="张三" readonly>
+            </div>
+            
+            <div class="audit-form-group">
+                <label for="auditResult">审核结果</label>
+                <select id="auditResult" class="audit-form-select">
+                    <option value="approved">通过</option>
+                    <option value="rejected">驳回</option>
+                    <option value="partiallyApproved">部分通过</option>
+                </select>
+            </div>
+            
+            <div class="audit-form-group">
+                <label for="auditComment">审核意见</label>
+                <textarea id="auditComment" class="audit-form-textarea" placeholder="请输入审核意见"></textarea>
+            </div>
+            
+            <div class="audit-modal-footer">
+                <button class="btn-cancel" id="cancelAudit">
+                    <i class="fas fa-times"></i> 取消
+                </button>
+                <button class="btn-reject" id="rejectAudit">
+                    <i class="fas fa-times-circle"></i> 驳回
+                </button>
+                <button class="btn-approve" id="approveAudit">
+                    <i class="fas fa-check-circle"></i> 审核通过
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 侧边栏切换功能
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const topNav = document.getElementById('topNav');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            topNav.classList.toggle('expanded');
+            
+            // 更新切换按钮图标
+            if (sidebar.classList.contains('collapsed')) {
+                sidebarToggle.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            } else {
+                sidebarToggle.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            }
+        }
+        
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('expanded');
+        }
+        
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+        
+        // 项目选择联动
+        const projectSelect = document.getElementById('projectName');
+        const sectionSelect = document.getElementById('section');
+        
+        projectSelect.addEventListener('change', function() {
+            const projectId = this.value;
+            
+            // 清空标段选择
+            sectionSelect.innerHTML = '<option value="">全部标段</option>';
+            
+            if (!projectId) {
+                return;
+            }
+            
+            // 根据选择的项目加载标段数据
+            let sections = [];
+            
+            switch(projectId) {
+                case '1':
+                    sections = [
+                        {id: '1-1', name: '标段1'},
+                        {id: '1-2', name: '标段2'},
+                        {id: '1-3', name: '标段3'}
+                    ];
+                    break;
+                case '2':
+                    sections = [
+                        {id: '2-1', name: '标段1'},
+                        {id: '2-2', name: '标段2'}
+                    ];
+                    break;
+                case '3':
+                    sections = [
+                        {id: '3-1', name: '标段1'},
+                        {id: '3-2', name: '标段2'},
+                        {id: '3-3', name: '标段3'},
+                        {id: '3-4', name: '标段4'}
+                    ];
+                    break;
+                case '4':
+                    sections = [
+                        {id: '4-1', name: '标段1'},
+                        {id: '4-2', name: '标段2'}
+                    ];
+                    break;
+                case '5':
+                    sections = [
+                        {id: '5-1', name: '标段1'}
+                    ];
+                    break;
+            }
+            
+            // 添加标段选项
+            sections.forEach(section => {
+                const option = document.createElement('option');
+                option.value = section.id;
+                option.textContent = section.name;
+                sectionSelect.appendChild(option);
+            });
+        });
+        
+        // 搜索和筛选功能
+        const applyFilterBtn = document.getElementById('applyFilter');
+        const resetFilter = document.getElementById('resetFilter');
+        
+        applyFilterBtn.addEventListener('click', function() {
+            alert('搜索条件已应用，正在加载数据...');
+            // 这里可以添加搜索和筛选的逻辑
+        });
+        
+        resetFilter.addEventListener('click', function() {
+            // 重置所有搜索条件
+            document.getElementById('projectName').value = '';
+            document.getElementById('section').innerHTML = '<option value="">全部标段</option>';
+            document.getElementById('auditType').value = '';
+            document.getElementById('auditStatus').value = '';
+            document.getElementById('auditor').value = '';
+            document.getElementById('auditPeriod').value = '';
+        });
+        
+        // 表格操作功能
+        const selectAll = document.getElementById('selectAll');
+        const tableCheckboxes = document.querySelectorAll('.table-checkbox:not(#selectAll)');
+        
+        selectAll.addEventListener('change', function() {
+            const isChecked = this.checked;
+            tableCheckboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+        });
+        
+        // 待审核项置顶
+        const pendingFirstBtn = document.getElementById('pendingFirstBtn');
+        
+        pendingFirstBtn.addEventListener('click', function() {
+            // 这里可以添加待审核项置顶的逻辑
+            alert('待审核项已置顶');
+        });
+        
+        // 表格行操作按钮
+        const tableActionButtons = document.querySelectorAll('.table-action');
+        
+        tableActionButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const actionType = this.classList.contains('view') ? '查看' : 
+                                   this.classList.contains('audit') ? '审核' : 
+                                   this.classList.contains('detail') ? '详情' : '删除';
+                
+                if (actionType === '审核') {
+                    // 获取当前行的数据
+                    const row = this.closest('tr');
+                    const cells = row.querySelectorAll('td');
+                    
+                    // 填充审核对话框数据
+                    document.getElementById('auditRecordId').value = cells[1].textContent;
+                    document.getElementById('auditType').value = cells[2].textContent;
+                    document.getElementById('relatedId').value = cells[3].textContent;
+                    document.getElementById('projectName').value = cells[4].textContent;
+                    document.getElementById('submitter').value = cells[5].textContent;
+                    document.getElementById('submitTime').value = cells[6].textContent;
+                    
+                    // 打开审核对话框
+                    document.getElementById('auditModal').style.display = 'flex';
+                } else {
+                    alert(`执行${actionType}操作`);
+                }
+            });
+        });
+        
+        // 顶部操作按钮
+        const batchAuditBtn = document.getElementById('batchAuditBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const exportSelectedBtn = document.getElementById('exportSelectedBtn');
+        
+        batchAuditBtn.addEventListener('click', function() {
+            // 检查是否有选中的记录
+            let hasSelected = false;
+            let hasPending = false;
+            
+            tableCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    hasSelected = true;
+                    const row = checkbox.closest('tr');
+                    if (row.classList.contains('pending-row')) {
+                        hasPending = true;
+                    }
+                }
+            });
+            
+            if (hasSelected) {
+                if (hasPending) {
+                    alert('开始批量审核选中的记录');
+                    // 这里可以添加批量审核的逻辑
+                } else {
+                    alert('选中的记录中没有待审核的记录');
+                }
+            } else {
+                alert('请至少选择一条记录');
+            }
+        });
+        
+        exportBtn.addEventListener('click', function() {
+            alert('开始导出数据，请稍候...');
+            // 这里可以添加导出数据的逻辑
+        });
+        
+        exportSelectedBtn.addEventListener('click', function() {
+            // 检查是否有选中的记录
+            let hasSelected = false;
+            
+            tableCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    hasSelected = true;
+                }
+            });
+            
+            if (hasSelected) {
+                alert('开始导出选中的数据，请稍候...');
+                // 这里可以添加导出选中数据的逻辑
+            } else {
+                alert('请至少选择一条记录');
+            }
+        });
+        
+        refreshBtn.addEventListener('click', function() {
+            // 添加刷新动画
+            this.querySelector('i').classList.add('fa-spin');
+            
+            // 模拟刷新操作
+            setTimeout(() => {
+                this.querySelector('i').classList.remove('fa-spin');
+                alert('数据已刷新');
+            }, 1000);
+        });
+        
+        // 分页控件
+        const paginationButtons = document.querySelectorAll('.pagination-button:not(:disabled)');
+        const paginationSelect = document.querySelector('.pagination-select');
+        
+        paginationButtons.forEach(button => {
+            if (!button.classList.contains('active')) {
+                button.addEventListener('click', function() {
+                    // 移除所有活动状态
+                    document.querySelectorAll('.pagination-button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    // 添加当前活动状态
+                    this.classList.add('active');
+                    
+                    // 如果是上一页或下一页按钮
+                    if (this.querySelector('i')) {
+                        // 这里可以添加翻页逻辑
+                        alert('切换到下一页数据');
+                    }
+                });
+            }
+        });
+        
+        paginationSelect.addEventListener('change', function() {
+            const pageSize = this.value;
+            alert(`每页显示${pageSize}条数据`);
+            // 这里可以添加改变每页显示数量的逻辑
+        });
+        
+        // 审核对话框操作
+        const auditModal = document.getElementById('auditModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelAudit = document.getElementById('cancelAudit');
+        const approveAudit = document.getElementById('approveAudit');
+        const rejectAudit = document.getElementById('rejectAudit');
+        
+        closeModal.addEventListener('click', function() {
+            auditModal.style.display = 'none';
+        });
+        
+        cancelAudit.addEventListener('click', function() {
+            auditModal.style.display = 'none';
+        });
+        
+        approveAudit.addEventListener('click', function() {
+            const auditComment = document.getElementById('auditComment').value;
+            
+            if (!auditComment.trim()) {
+                if (!confirm('确定要在不填写审核意见的情况下通过审核吗？')) {
+                    return;
+                }
+            }
+            
+            alert('审核已通过');
+            auditModal.style.display = 'none';
+            
+            // 重置审核对话框
+            document.getElementById('auditComment').value = '';
+        });
+        
+        rejectAudit.addEventListener('click', function() {
+            const auditComment = document.getElementById('auditComment').value;
+            
+            if (!auditComment.trim()) {
+                alert('请填写驳回原因');
+                return;
+            }
+            
+            alert('审核已驳回');
+            auditModal.style.display = 'none';
+            
+            // 重置审核对话框
+            document.getElementById('auditComment').value = '';
+        });
+        
+        // 点击对话框外部关闭对话框
+        window.addEventListener('click', function(event) {
+            if (event.target === auditModal) {
+                auditModal.style.display = 'none';
+                
+                // 重置审核对话框
+                document.getElementById('auditComment').value = '';
+            }
+        });
+        
+        // 搜索和筛选功能
+        const applyFilter = document.getElementById('applyFilter');
+        const resetFilter = document.getElementById('resetFilter');
+        
+        applyFilter.addEventListener('click', function() {
+            // 获取所有筛选条件
+            const projectName = document.getElementById('projectName').value;
+            const section = document.getElementById('section').value;
+            const auditType = document.getElementById('auditType').value;
+            const auditStatus = document.getElementById('auditStatus').value;
+            const auditor = document.getElementById('auditor').value;
+            const auditPeriod = document.getElementById('auditPeriod').value;
+            
+            // 这里可以添加筛选逻辑
+            alert('应用筛选条件');
+        });
+        
+        resetFilter.addEventListener('click', function() {
+            // 重置所有筛选条件
+            document.getElementById('projectName').value = '';
+            document.getElementById('section').value = '';
+            document.getElementById('auditType').value = '';
+            document.getElementById('auditStatus').value = '';
+            document.getElementById('auditor').value = '';
+            document.getElementById('auditPeriod').value = '';
+            
+            // 这里可以添加重置逻辑
+            alert('筛选条件已重置');
+        });
+        
+        // 响应式处理
+        function handleResize() {
+            const width = window.innerWidth;
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const topNav = document.getElementById('top-nav');
+            
+            // 在移动设备上默认收起侧边栏
+            if (width < 768) {
+                sidebar.classList.remove('expanded');
+                mainContent.classList.remove('expanded');
+                topNav.classList.remove('expanded');
+            } else {
+                sidebar.classList.add('expanded');
+                mainContent.classList.remove('expanded');
+                topNav.classList.remove('expanded');
+            }
+        }
+        
+        // 初始化响应式处理
+        handleResize();
+        // 监听窗口大小变化
+        window.addEventListener('resize', handleResize);
+    </script>
+</body>
+</html>

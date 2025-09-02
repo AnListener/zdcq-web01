@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高速公路征地拆迁管理系统 - 征拆区域统计</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 征拆区域统计特定样式 */
+        .demolition-stats-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 搜索和筛选区域 */
+        .search-filter-container {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .search-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .search-group {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .search-group label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+            min-width: 100px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .search-select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+        
+        .search-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .search-date {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .search-date:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .btn-filter {
+            padding: 8px 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-filter:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-reset {
+            padding: 8px 16px;
+            background-color: white;
+            color: var(--info);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-reset:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* 数据卡片区域 */
+        .data-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .data-card {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .data-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+        
+        .card-icon-primary {
+            background-color: var(--primary);
+        }
+        
+        .card-icon-info {
+            background-color: var(--info);
+        }
+        
+        .card-icon-success {
+            background-color: var(--success);
+        }
+        
+        .card-icon-warning {
+            background-color: var(--warning);
+        }
+        
+        .card-title {
+            font-size: 14px;
+            color: var(--info);
+            font-weight: 500;
+        }
+        
+        .card-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .card-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .card-change.positive {
+            color: var(--success);
+        }
+        
+        .card-change.negative {
+            color: var(--danger);
+        }
+        
+        .card-unit {
+            font-size: 12px;
+            color: var(--info);
+            margin-top: 4px;
+        }
+        
+        /* 图表区域 */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .chart-card {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .chart-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .chart-action-button {
+            width: 28px;
+            height: 28px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .chart-action-button:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .chart-content {
+            height: 300px;
+            position: relative;
+        }
+        
+        /* 图表占位区域 */
+        .chart-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-light);
+            border-radius: 4px;
+            color: var(--info);
+            font-size: 14px;
+            position: relative;
+        }
+        
+        .chart-placeholder::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0,0,0,0.03) 25%, transparent 25%, transparent 50%, rgba(0,0,0,0.03) 50%, rgba(0,0,0,0.03) 75%, transparent 75%, transparent);
+            background-size: 20px 20px;
+        }
+        
+        /* 表格区域 */
+        .table-container {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background-color: var(--bg-light);
+        }
+        
+        .table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-action-button {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .table-action-button:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background-color: var(--bg-light);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        
+        .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--dark);
+        }
+        
+        .data-table tr:hover {
+            background-color: var(--bg-light);
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-primary {
+            background-color: rgba(22, 93, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        .badge-success {
+            background-color: rgba(0, 180, 42, 0.1);
+            color: var(--success);
+        }
+        
+        .badge-warning {
+            background-color: rgba(255, 125, 0, 0.1);
+            color: var(--warning);
+        }
+        
+        .badge-danger {
+            background-color: rgba(245, 63, 63, 0.1);
+            color: var(--danger);
+        }
+        
+        .table-actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-action {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .table-action:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .table-action.view {
+            color: var(--primary);
+        }
+        
+        .table-action.detail {
+            color: var(--info);
+        }
+        
+        .table-action.export {
+            color: var(--success);
+        }
+        
+        /* 金额显示样式 */
+        .amount {
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        /* 进度条 */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--bg-light);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        /* 百分比显示 */
+        .percentage {
+            font-size: 12px;
+            color: var(--info);
+            margin-left: 8px;
+        }
+        
+        /* 分页区域 */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            background-color: var(--bg-light);
+        }
+        
+        .pagination-info {
+            font-size: 14px;
+            color: var(--info);
+        }
+        
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .pagination-button {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: white;
+            color: var(--info);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .pagination-button:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .pagination-button.active {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-select {
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        /* 响应式样式 */
+        @media (max-width: 768px) {
+            .search-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .search-group {
+                width: 100%;
+            }
+            
+            .data-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-card {
+                min-width: auto;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .table-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .pagination-container {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .pagination-controls {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* 统计类型标签 */
+        .stat-type-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .stat-type-land {
+            background-color: rgba(22, 93, 255, 0.1);
+            color: var(--primary);
+        }
+        
+        .stat-type-house {
+            background-color: rgba(0, 180, 42, 0.1);
+            color: var(--success);
+        }
+        
+        .stat-type-attachment {
+            background-color: rgba(255, 125, 0, 0.1);
+            color: var(--warning);
+        }
+        
+        /* 项目进度指示器 */
+        .project-progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .progress-text {
+            font-size: 12px;
+            color: var(--info);
+            min-width: 60px;
+        }
+        
+        /* 层级显示 */
+        .hierarchy {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+        }
+        
+        .hierarchy-level {
+            padding: 2px 6px;
+            background-color: var(--bg-light);
+            border-radius: 3px;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demolition-stats-container">
+        <!-- 侧边栏导航 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-road logo-icon"></i>
+                    <span class="logo-text">征拆管理系统</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <div class="menu-section-title">主导航</div>
+                
+                <a href="dashboard.html" class="menu-item">
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">仪表盘</span>
+                </a>
+                
+                <div class="menu-section-title">GIS数据管理</div>
+                
+                <a href="gis-data-upload.html" class="menu-item">
+                    <i class="fas fa-upload menu-icon"></i>
+                    <span class="menu-text">测绘数据上传</span>
+                </a>
+                
+                <a href="gis-publish.html" class="menu-item">
+                    <i class="fas fa-map-marked-alt menu-icon"></i>
+                    <span class="menu-text">GIS发布</span>
+                </a>
+                
+                <div class="menu-section-title">台账管理</div>
+                
+                <a href="gis-ledger.html" class="menu-item">
+                    <i class="fas fa-database menu-icon"></i>
+                    <span class="menu-text">GIS台账</span>
+                </a>
+                
+                <a href="land-ledger.html" class="menu-item">
+                    <i class="fas fa-paragraph menu-icon"></i>
+                    <span class="menu-text">征地台账</span>
+                </a>
+                
+                <a href="house-ledger.html" class="menu-item">
+                    <i class="fas fa-home menu-icon"></i>
+                    <span class="menu-text">房屋台账</span>
+                </a>
+                
+                <a href="attachment-ledger.html" class="menu-item">
+                    <i class="fas fa-paperclip menu-icon"></i>
+                    <span class="menu-text">附着物台账</span>
+                </a>
+                
+                <a href="audit-ledger.html" class="menu-item">
+                    <i class="fas fa-search menu-icon"></i>
+                    <span class="menu-text">审核台账</span>
+                </a>
+                
+                <a href="agreement-ledger.html" class="menu-item">
+                    <i class="fas fa-file-contract menu-icon"></i>
+                    <span class="menu-text">协议台账</span>
+                </a>
+                
+                <a href="settlement-ledger.html" class="menu-item">
+                    <i class="fas fa-money-bill-wave menu-icon"></i>
+                    <span class="menu-text">结算台账</span>
+                </a>
+                
+                <div class="menu-section-title">基础配置管理</div>
+                
+                <a href="form-template.html" class="menu-item">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">表单协议模板管理</span>
+                </a>
+                
+                <a href="process-config.html" class="menu-item">
+                    <i class="fas fa-sitemap menu-icon"></i>
+                    <span class="menu-text">流程配置</span>
+                </a>
+                
+                <a href="compensation-standard.html" class="menu-item">
+                    <i class="fas fa-list-ol menu-icon"></i>
+                    <span class="menu-text">区域补偿标准库</span>
+                </a>
+                
+                <div class="menu-section-title">统计分析</div>
+                
+                <a href="demolition-stats.html" class="menu-item active">
+                    <i class="fas fa-chart-bar menu-icon"></i>
+                    <span class="menu-text">征拆区域统计</span>
+                </a>
+                
+                <a href="project-stats.html" class="menu-item">
+                    <i class="fas fa-chart-line menu-icon"></i>
+                    <span class="menu-text">项目统计</span>
+                </a>
+                
+                <a href="group-stats.html" class="menu-item">
+                    <i class="fas fa-chart-pie menu-icon"></i>
+                    <span class="menu-text">集团统计</span>
+                </a>
+                
+                <div class="menu-section-title">系统管理</div>
+                
+                <a href="user-role.html" class="menu-item">
+                    <i class="fas fa-users-cog menu-icon"></i>
+                    <span class="menu-text">用户角色管理</span>
+                </a>
+                
+                <a href="project-auth.html" class="menu-item">
+                    <i class="fas fa-key menu-icon"></i>
+                    <span class="menu-text">项目授权管理</span>
+                </a>
+                
+                <div class="menu-section-title">辅助支持</div>
+                
+                <a href="function-demo.html" class="menu-item">
+                    <i class="fas fa-play-circle menu-icon"></i>
+                    <span class="menu-text">功能演示入口</span>
+                </a>
+                
+                <a href="training-materials.html" class="menu-item">
+                    <i class="fas fa-book menu-icon"></i>
+                    <span class="menu-text">培训资料</span>
+                </a>
+                
+                <a href="operation-manual.html" class="menu-item">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">操作手册</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="main-content" id="mainContent">
+            <!-- 顶部导航栏 -->
+            <header class="top-nav" id="topNav">
+                <div class="nav-left">
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="nav-title">征拆区域统计</h1>
+                </div>
+                
+                <div class="nav-right">
+                    <div class="nav-item">
+                        <i class="fas fa-bell nav-icon"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-envelope nav-icon"></i>
+                        <span class="notification-badge">2</span>
+                    </div>
+                    
+                    <div class="nav-item">
+                        <i class="fas fa-cog nav-icon"></i>
+                    </div>
+                    
+                    <div class="user-profile">
+                        <div class="avatar">张</div>
+                        <div class="user-info">
+                            <div class="user-name">张三</div>
+                            <div class="user-role">系统管理员</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- 页面内容 -->
+            <div class="page-content">
+                <div class="page-header">
+                    <h2 class="page-title">征拆区域统计</h2>
+                    <div class="flex gap-3">
+                        <button class="btn btn-primary" id="exportAllBtn">
+                            <i class="fas fa-file-export"></i> 导出全部
+                        </button>
+                        <button class="btn btn-secondary" id="refreshBtn">
+                            <i class="fas fa-sync-alt"></i> 刷新
+                        </button>
+                        <button class="btn btn-secondary" id="printBtn">
+                            <i class="fas fa-print"></i> 打印
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 搜索和筛选区域 -->
+                <div class="search-filter-container">
+                    <div class="search-row">
+                        <div class="search-group">
+                            <label for="project">项目名称</label>
+                            <select id="project" class="search-select">
+                                <option value="">全部项目</option>
+                                <option value="project1">武黄高速扩建工程</option>
+                                <option value="project2">沪渝高速湖北段</option>
+                                <option value="project3">京港澳高速湖北段改扩建</option>
+                                <option value="project4">沪蓉高速湖北段</option>
+                                <option value="project5">麻竹高速</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="section">标段</label>
+                            <select id="section" class="search-select">
+                                <option value="">全部标段</option>
+                                <option value="section1">第一标段</option>
+                                <option value="section2">第二标段</option>
+                                <option value="section3">第三标段</option>
+                                <option value="section4">第四标段</option>
+                                <option value="section5">第五标段</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="region">征拆区域</label>
+                            <select id="region" class="search-select">
+                                <option value="">全部区域</option>
+                                <option value="region1">武汉市江夏区</option>
+                                <option value="region2">武汉市洪山区</option>
+                                <option value="region3">黄石市下陆区</option>
+                                <option value="region4">黄石市西塞山区</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="search-row">
+                        <div class="search-group">
+                            <label for="startDate">开始日期</label>
+                            <input type="date" id="startDate" class="search-date" value="2023-01-01">
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="endDate">结束日期</label>
+                            <input type="date" id="endDate" class="search-date" value="2023-12-31">
+                        </div>
+                        
+                        <div class="search-group">
+                            <label for="statType">统计类型</label>
+                            <select id="statType" class="search-select">
+                                <option value="total">综合统计</option>
+                                <option value="land">征地统计</option>
+                                <option value="house">房屋统计</option>
+                                <option value="attachment">附着物统计</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button class="btn-reset" id="resetFilter">
+                            <i class="fas fa-redo-alt"></i> 重置
+                        </button>
+                        <button class="btn-filter" id="applyFilter">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 数据卡片区域 -->
+                <div class="data-cards">
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-primary">
+                                <i class="fas fa-square"></i>
+                            </div>
+                            <div class="card-title">征地总面积</div>
+                        </div>
+                        <div class="card-value">126.35</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长2.15%</span>
+                        </div>
+                        <div class="card-unit">公顷</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-success">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="card-title">房屋拆迁面积</div>
+                        </div>
+                        <div class="card-value">42,568.72</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长1.87%</span>
+                        </div>
+                        <div class="card-unit">平方米</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-warning">
+                                <i class="fas fa-paperclip"></i>
+                            </div>
+                            <div class="card-title">附着物数量</div>
+                        </div>
+                        <div class="card-value">863</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长5.32%</span>
+                        </div>
+                        <div class="card-unit">项</div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="card-header">
+                            <div class="card-icon card-icon-info">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="card-title">总补偿金额</div>
+                        </div>
+                        <div class="card-value">3,256.78</div>
+                        <div class="card-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>较上月增长3.24%</span>
+                        </div>
+                        <div class="card-unit">万元</div>
+                    </div>
+                </div>
+                
+                <!-- 图表区域 -->
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">征拆区域分布</div>
+                            <div class="chart-actions">
+                                <button class="chart-action-button" title="查看">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="chart-action-button" title="导出">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="chart-action-button" title="全屏">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-content">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-pie" style="font-size: 48px; margin-bottom: 16px;"></i>
+                                <div>区域分布饼图</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">月度征拆进度</div>
+                            <div class="chart-actions">
+                                <button class="chart-action-button" title="查看">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="chart-action-button" title="导出">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="chart-action-button" title="全屏">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-content">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-line" style="font-size: 48px; margin-bottom: 16px;"></i>
+                                <div>月度进度折线图</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">征拆类型比例</div>
+                            <div class="chart-actions">
+                                <button class="chart-action-button" title="查看">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="chart-action-button" title="导出">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="chart-action-button" title="全屏">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-content">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-bar" style="font-size: 48px; margin-bottom: 16px;"></i>
+                                <div>征拆类型柱状图</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">补偿金额对比</div>
+                            <div class="chart-actions">
+                                <button class="chart-action-button" title="查看">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="chart-action-button" title="导出">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="chart-action-button" title="全屏">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-content">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-bar" style="font-size: 48px; margin-bottom: 16px;"></i>
+                                <div>补偿金额对比图</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 表格区域 -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">征拆区域统计明细</div>
+                        <div class="table-actions">
+                            <button class="table-action-button" id="exportTableBtn">
+                                <i class="fas fa-file-export"></i>
+                                导出表格
+                            </button>
+                            <button class="table-action-button" id="customizeColumnsBtn">
+                                <i class="fas fa-columns"></i>
+                                自定义列
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>项目名称</th>
+                                    <th>标段</th>
+                                    <th>征拆区域</th>
+                                    <th>统计类型</th>
+                                    <th>征地面积(公顷)</th>
+                                    <th>房屋面积(平方米)</th>
+                                    <th>附着物数量(项)</th>
+                                    <th>补偿金额(万元)</th>
+                                    <th>项目进度</th>
+                                    <th>统计日期</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>武黄高速扩建工程</td>
+                                    <td>第一标段</td>
+                                    <td>
+                                        <div class="hierarchy">
+                                            武汉市 > 江夏区 > 纸坊街道
+                                            <span class="hierarchy-level">街道</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="stat-type-badge stat-type-land">综合统计</span>
+                                    </td>
+                                    <td>35.26</td>
+                                    <td>12,345.67</td>
+                                    <td>234</td>
+                                    <td class="amount">896.72</td>
+                                    <td>
+                                        <div class="project-progress">
+                                            <div class="progress-text">85%</div>
+                                            <div class="progress-bar-container">
+                                                <div class="progress-bar" style="width: 85%;"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>2023-12-15</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action detail" title="明细">
+                                            <i class="fas fa-list"></i>
+                                        </button>
+                                        <button class="table-action export" title="导出">
+                                            <i class="fas fa-file-export"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>2</td>
+                                    <td>武黄高速扩建工程</td>
+                                    <td>第二标段</td>
+                                    <td>
+                                        <div class="hierarchy">
+                                            武汉市 > 江夏区 > 庙山开发区
+                                            <span class="hierarchy-level">开发区</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="stat-type-badge stat-type-house">房屋统计</span>
+                                    </td>
+                                    <td>22.38</td>
+                                    <td>15,678.92</td>
+                                    <td>189</td>
+                                    <td class="amount">1,024.35</td>
+                                    <td>
+                                        <div class="project-progress">
+                                            <div class="progress-text">72%</div>
+                                            <div class="progress-bar-container">
+                                                <div class="progress-bar" style="width: 72%;"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>2023-12-15</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action detail" title="明细">
+                                            <i class="fas fa-list"></i>
+                                        </button>
+                                        <button class="table-action export" title="导出">
+                                            <i class="fas fa-file-export"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>3</td>
+                                    <td>沪渝高速湖北段</td>
+                                    <td>第三标段</td>
+                                    <td>
+                                        <div class="hierarchy">
+                                            黄石市 > 下陆区 > 团城山街道
+                                            <span class="hierarchy-level">街道</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="stat-type-badge stat-type-attachment">附着物统计</span>
+                                    </td>
+                                    <td>45.12</td>
+                                    <td>8,923.45</td>
+                                    <td>312</td>
+                                    <td class="amount">756.18</td>
+                                    <td>
+                                        <div class="project-progress">
+                                            <div class="progress-text">90%</div>
+                                            <div class="progress-bar-container">
+                                                <div class="progress-bar" style="width: 90%;"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>2023-12-15</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action detail" title="明细">
+                                            <i class="fas fa-list"></i>
+                                        </button>
+                                        <button class="table-action export" title="导出">
+                                            <i class="fas fa-file-export"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>4</td>
+                                    <td>京港澳高速湖北段改扩建</td>
+                                    <td>第四标段</td>
+                                    <td>
+                                        <div class="hierarchy">
+                                            武汉市 > 洪山区 > 关山街道
+                                            <span class="hierarchy-level">街道</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="stat-type-badge stat-type-land">综合统计</span>
+                                    </td>
+                                    <td>18.45</td>
+                                    <td>5,612.34</td>
+                                    <td>128</td>
+                                    <td class="amount">579.53</td>
+                                    <td>
+                                        <div class="project-progress">
+                                            <div class="progress-text">65%</div>
+                                            <div class="progress-bar-container">
+                                                <div class="progress-bar" style="width: 65%;"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>2023-12-15</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action detail" title="明细">
+                                            <i class="fas fa-list"></i>
+                                        </button>
+                                        <button class="table-action export" title="导出">
+                                            <i class="fas fa-file-export"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>5</td>
+                                    <td>麻竹高速</td>
+                                    <td>第五标段</td>
+                                    <td>
+                                        <div class="hierarchy">
+                                            黄石市 > 西塞山区 > 磁湖街道
+                                            <span class="hierarchy-level">街道</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="stat-type-badge stat-type-house">房屋统计</span>
+                                    </td>
+                                    <td>32.87</td>
+                                    <td>10,245.67</td>
+                                    <td>218</td>
+                                    <td class="amount">687.32</td>
+                                    <td>
+                                        <div class="project-progress">
+                                            <div class="progress-text">80%</div>
+                                            <div class="progress-bar-container">
+                                                <div class="progress-bar" style="width: 80%;"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>2023-12-15</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action detail" title="明细">
+                                            <i class="fas fa-list"></i>
+                                        </button>
+                                        <button class="table-action export" title="导出">
+                                            <i class="fas fa-file-export"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>6</td>
+                                    <td>沪蓉高速湖北段</td>
+                                    <td>第二标段</td>
+                                    <td>
+                                        <div class="hierarchy">
+                                            武汉市 > 江夏区 > 藏龙岛开发区
+                                            <span class="hierarchy-level">开发区</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="stat-type-badge stat-type-attachment">附着物统计</span>
+                                    </td>
+                                    <td>26.78</td>
+                                    <td>7,892.34</td>
+                                    <td>176</td>
+                                    <td class="amount">498.21</td>
+                                    <td>
+                                        <div class="project-progress">
+                                            <div class="progress-text">75%</div>
+                                            <div class="progress-bar-container">
+                                                <div class="progress-bar" style="width: 75%;"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>2023-12-15</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action detail" title="明细">
+                                            <i class="fas fa-list"></i>
+                                        </button>
+                                        <button class="table-action export" title="导出">
+                                            <i class="fas fa-file-export"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>7</td>
+                                    <td>武黄高速扩建工程</td>
+                                    <td>第三标段</td>
+                                    <td>
+                                        <div class="hierarchy">
+                                            黄石市 > 下陆区 > 东方山街道
+                                            <span class="hierarchy-level">街道</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="stat-type-badge stat-type-land">综合统计</span>
+                                    </td>
+                                    <td>42.31</td>
+                                    <td>14,521.67</td>
+                                    <td>289</td>
+                                    <td class="amount">987.64</td>
+                                    <td>
+                                        <div class="project-progress">
+                                            <div class="progress-text">88%</div>
+                                            <div class="progress-bar-container">
+                                                <div class="progress-bar" style="width: 88%;"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>2023-12-15</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action detail" title="明细">
+                                            <i class="fas fa-list"></i>
+                                        </button>
+                                        <button class="table-action export" title="导出">
+                                            <i class="fas fa-file-export"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>8</td>
+                                    <td>沪渝高速湖北段</td>
+                                    <td>第一标段</td>
+                                    <td>
+                                        <div class="hierarchy">
+                                            武汉市 > 洪山区 > 狮子山街道
+                                            <span class="hierarchy-level">街道</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="stat-type-badge stat-type-house">房屋统计</span>
+                                    </td>
+                                    <td>29.63</td>
+                                    <td>9,876.54</td>
+                                    <td>165</td>
+                                    <td class="amount">589.21</td>
+                                    <td>
+                                        <div class="project-progress">
+                                            <div class="progress-text">70%</div>
+                                            <div class="progress-bar-container">
+                                                <div class="progress-bar" style="width: 70%;"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>2023-12-15</td>
+                                    <td class="table-actions-cell">
+                                        <button class="table-action view" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="table-action detail" title="明细">
+                                            <i class="fas fa-list"></i>
+                                        </button>
+                                        <button class="table-action export" title="导出">
+                                            <i class="fas fa-file-export"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 分页区域 -->
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            显示 1-8 条，共 45 条
+                        </div>
+                        
+                        <div class="pagination-controls">
+                            <button class="pagination-button" disabled>
+                                <i class="fas fa-angle-left"></i>
+                            </button>
+                            <button class="pagination-button active">1</button>
+                            <button class="pagination-button">2</button>
+                            <button class="pagination-button">3</button>
+                            <button class="pagination-button">4</button>
+                            <button class="pagination-button">5</button>
+                            <button class="pagination-button">
+                                <i class="fas fa-angle-right"></i>
+                            </button>
+                            <select class="pagination-select">
+                                <option value="10">10条/页</option>
+                                <option value="20">20条/页</option>
+                                <option value="50">50条/页</option>
+                                <option value="100">100条/页</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 侧边栏切换功能
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const topNav = document.getElementById('topNav');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            topNav.classList.toggle('expanded');
+            
+            // 更新切换按钮图标
+            if (sidebar.classList.contains('collapsed')) {
+                sidebarToggle.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            } else {
+                sidebarToggle.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            }
+        }
+        
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('expanded');
+        }
+        
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+        
+        // 搜索和筛选功能
+        const applyFilter = document.getElementById('applyFilter');
+        const resetFilter = document.getElementById('resetFilter');
+        
+        applyFilter.addEventListener('click', function() {
+            alert('搜索条件已应用，正在加载数据...');
+            // 这里可以添加搜索和筛选的逻辑
+        });
+        
+        resetFilter.addEventListener('click', function() {
+            // 重置所有搜索条件
+            document.getElementById('project').value = '';
+            document.getElementById('section').value = '';
+            document.getElementById('region').value = '';
+            document.getElementById('startDate').value = '2023-01-01';
+            document.getElementById('endDate').value = '2023-12-31';
+            document.getElementById('statType').value = 'total';
+        });
+        
+        // 顶部操作按钮
+        const exportAllBtn = document.getElementById('exportAllBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const printBtn = document.getElementById('printBtn');
+        
+        exportAllBtn.addEventListener('click', function() {
+            alert('开始导出所有统计数据，请稍候...');
+            // 这里可以添加导出所有数据的逻辑
+        });
+        
+        refreshBtn.addEventListener('click', function() {
+            // 添加刷新动画
+            this.querySelector('i').classList.add('fa-spin');
+            
+            // 模拟刷新操作
+            setTimeout(() => {
+                this.querySelector('i').classList.remove('fa-spin');
+                alert('数据已刷新');
+            }, 1000);
+        });
+        
+        printBtn.addEventListener('click', function() {
+            alert('准备打印统计报表...');
+            // 这里可以添加打印逻辑
+        });
+        
+        // 表格操作按钮
+        const exportTableBtn = document.getElementById('exportTableBtn');
+        const customizeColumnsBtn = document.getElementById('customizeColumnsBtn');
+        
+        exportTableBtn.addEventListener('click', function() {
+            alert('开始导出表格数据，请稍候...');
+            // 这里可以添加导出表格数据的逻辑
+        });
+        
+        customizeColumnsBtn.addEventListener('click', function() {
+            alert('打开列自定义对话框');
+            // 这里可以添加打开列自定义对话框的逻辑
+        });
+        
+        // 表格行操作按钮
+        const tableActionButtons = document.querySelectorAll('.table-action');
+        
+        tableActionButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const actionType = this.classList.contains('view') ? '查看详情' : 
+                                   this.classList.contains('detail') ? '查看明细' : '导出';
+                
+                if (actionType === '导出') {
+                    alert('开始导出该条统计数据，请稍候...');
+                    // 这里可以添加导出单条数据的逻辑
+                } else if (actionType === '查看明细') {
+                    alert('查看征拆区域统计明细');
+                    // 这里可以添加查看明细的逻辑
+                } else {
+                    alert(`查看征拆区域统计详情`);
+                }
+            });
+        });
+        
+        // 图表操作按钮
+        const chartActionButtons = document.querySelectorAll('.chart-action-button');
+        
+        chartActionButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const title = this.getAttribute('title');
+                alert(`执行${title}操作`);
+                // 这里可以添加相应的图表操作逻辑
+            });
+        });
+        
+        // 分页控件
+        const paginationButtons = document.querySelectorAll('.pagination-button:not(:disabled)');
+        const paginationSelect = document.querySelector('.pagination-select');
+        
+        paginationButtons.forEach(button => {
+            if (!button.classList.contains('active')) {
+                button.addEventListener('click', function() {
+                    // 移除所有活动状态
+                    document.querySelectorAll('.pagination-button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    // 添加当前活动状态
+                    this.classList.add('active');
+                    
+                    // 如果是上一页或下一页按钮
+                    if (this.querySelector('i')) {
+                        // 这里可以添加翻页逻辑
+                        alert('切换到下一页数据');
+                    }
+                });
+            }
+        });
+        
+        paginationSelect.addEventListener('change', function() {
+            const pageSize = this.value;
+            alert(`每页显示${pageSize}条数据`);
+            // 这里可以添加改变每页显示数量的逻辑
+        });
+        
+        // 响应式处理
+        function handleResize() {
+            const width = window.innerWidth;
+            
+            // 在移动设备上默认收起侧边栏
+            if (width < 768) {
+                sidebar.classList.remove('expanded');
+            } else {
+                sidebar.classList.add('expanded');
+            }
+        }
+        
+        // 初始化响应式处理
+        handleResize();
+        // 监听窗口大小变化
+        window.addEventListener('resize', handleResize);
+        
+        // 项目和标段联动
+        const projectSelect = document.getElementById('project');
+        const sectionSelect = document.getElementById('section');
+        
+        projectSelect.addEventListener('change', function() {
+            const project = this.value;
+            // 清空标段选项
+            sectionSelect.innerHTML = '<option value="">全部标段</option>';
+            
+            if (project === 'project1') {
+                // 添加武黄高速扩建工程的标段选项
+                const sections = [
+                    { value: 'section1', name: '第一标段' },
+                    { value: 'section2', name: '第二标段' },
+                    { value: 'section3', name: '第三标段' }
+                ];
+                
+                sections.forEach(section => {
+                    const option = document.createElement('option');
+                    option.value = section.value;
+                    option.textContent = section.name;
+                    sectionSelect.appendChild(option);
+                });
+            } else if (project === 'project2') {
+                // 添加沪渝高速湖北段的标段选项
+                const sections = [
+                    { value: 'section1', name: '第一标段' },
+                    { value: 'section3', name: '第三标段' }
+                ];
+                
+                sections.forEach(section => {
+                    const option = document.createElement('option');
+                    option.value = section.value;
+                    option.textContent = section.name;
+                    sectionSelect.appendChild(option);
+                });
+            } else if (project === 'project3') {
+                // 添加京港澳高速湖北段改扩建的标段选项
+                const sections = [
+                    { value: 'section4', name: '第四标段' }
+                ];
+                
+                sections.forEach(section => {
+                    const option = document.createElement('option');
+                    option.value = section.value;
+                    option.textContent = section.name;
+                    sectionSelect.appendChild(option);
+                });
+            } else if (project === 'project4') {
+                // 添加沪蓉高速湖北段的标段选项
+                const sections = [
+                    { value: 'section2', name: '第二标段' }
+                ];
+                
+                sections.forEach(section => {
+                    const option = document.createElement('option');
+                    option.value = section.value;
+                    option.textContent = section.name;
+                    sectionSelect.appendChild(option);
+                });
+            } else if (project === 'project5') {
+                // 添加麻竹高速的标段选项
+                const sections = [
+                    { value: 'section5', name: '第五标段' }
+                ];
+                
+                sections.forEach(section => {
+                    const option = document.createElement('option');
+                    option.value = section.value;
+                    option.textContent = section.name;
+                    sectionSelect.appendChild(option);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
